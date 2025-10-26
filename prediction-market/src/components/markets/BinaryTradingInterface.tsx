@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { placeBetDirect } from '@/lib/program/direct'
 import { RPC_ENDPOINT } from '@/lib/program/constants'
 import { type MockMarket, getMarketOdds } from '@/lib/mock/markets'
+import { fetchUserBet, lamportsToSOL } from '@/lib/program/direct-read'
 
 interface BinaryTradingInterfaceProps {
   market: MockMarket
@@ -25,8 +26,42 @@ export default function BinaryTradingInterface({
   const [txSignature, setTxSignature] = useState<string | null>(null)
   const [walletBalance, setWalletBalance] = useState<number | null>(null)
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
+  const [existingBet, setExistingBet] = useState<any>(null)
+  const [isCheckingBet, setIsCheckingBet] = useState(false)
 
   const odds = getMarketOdds(market)
+
+  // Check if user already has a bet on this market
+  useEffect(() => {
+    const checkExistingBet = async () => {
+      if (!wallet?.publicKey) {
+        setExistingBet(null)
+        return
+      }
+
+      setIsCheckingBet(true)
+      try {
+        const marketPubkey = new PublicKey(market.id)
+        const bet = await fetchUserBet(wallet.publicKey, marketPubkey)
+        setExistingBet(bet)
+        
+        if (bet) {
+          console.log('User already has a bet:', {
+            amount: lamportsToSOL(bet.amount),
+            outcome: bet.outcome ? 'YES' : 'NO',
+            claimed: bet.claimed
+          })
+        }
+      } catch (error) {
+        console.error('Error checking existing bet:', error)
+        setExistingBet(null)
+      } finally {
+        setIsCheckingBet(false)
+      }
+    }
+
+    checkExistingBet()
+  }, [wallet?.publicKey, market.id])
 
   // Fetch wallet balance
   useEffect(() => {
@@ -56,6 +91,15 @@ export default function BinaryTradingInterface({
     // Wallet check
     if (!wallet) {
       toast.error('Please connect your wallet first')
+      return
+    }
+
+    // Check if user already has a bet
+    if (existingBet && !existingBet.claimed) {
+      toast.error(
+        `You already have a ${existingBet.outcome ? 'YES' : 'NO'} bet of ${lamportsToSOL(existingBet.amount).toFixed(2)} SOL on this market. Current version allows only one bet per user per market.`,
+        { duration: 5000 }
+      )
       return
     }
 
@@ -294,6 +338,29 @@ export default function BinaryTradingInterface({
         </div>
       )}
 
+      {/* Existing Bet Warning */}
+      {existingBet && !existingBet.claimed && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div className="flex-1">
+              <p className="text-yellow-300 font-semibold mb-1">
+                You already have an active bet on this market
+              </p>
+              <p className="text-yellow-200/70 text-sm">
+                Bet: {lamportsToSOL(existingBet.amount).toFixed(2)} SOL on{' '}
+                <span className={existingBet.outcome ? 'text-green-400' : 'text-red-400'}>
+                  {existingBet.outcome ? 'YES' : 'NO'}
+                </span>
+              </p>
+              <p className="text-yellow-200/70 text-xs mt-2">
+                Current version allows only one bet per user per market. Additional betting will be available in future updates.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Message */}
       {success && (
         <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
@@ -319,7 +386,9 @@ export default function BinaryTradingInterface({
         disabled={
           isSubmitting ||
           selectedOutcome === null ||
-          parseFloat(betAmount) <= 0
+          parseFloat(betAmount) <= 0 ||
+          (existingBet && !existingBet.claimed) ||
+          isCheckingBet
         }
         className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
@@ -328,6 +397,13 @@ export default function BinaryTradingInterface({
             <span className="animate-spin">⏳</span>
             Placing Bet...
           </span>
+        ) : isCheckingBet ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="animate-spin">⏳</span>
+            Checking...
+          </span>
+        ) : existingBet && !existingBet.claimed ? (
+          'Already Have Active Bet'
         ) : (
           `Place ${selectedOutcome === true ? 'YES' : selectedOutcome === false ? 'NO' : ''} Bet`
         )}
