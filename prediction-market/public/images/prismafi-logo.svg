@@ -1,72 +1,63 @@
 <svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Gradient for Hexagon: Pink → Purple → Orange -->
+    <!-- Gradient for Hexagon: Cyan -->
     <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF0080"/>
-      <stop offset="50%" stop-color="#8B5CF6"/>
-      <stop offset="100%" stop-color="#FF7A2F"/>
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="100%" stop-color="#00D8E0"/>
     </linearGradient>
     
-    <!-- Gradient for S: Purple → Pink → Orange -->
+    <!-- Gradient for S: Purple → Orange/Red -->
     <linearGradient id="sGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#8B5CF6"/>
-      <stop offset="50%" stop-color="#FF0080"/>
-      <stop offset="100%" stop-color="#FF7A2F"/>
+      <stop offset="0%" stop-color="#9D4EDD"/>
+      <stop offset="50%" stop-color="#D946EF"/>
+      <stop offset="100%" stop-color="#FF4500"/>
     </linearGradient>
     
-    <!-- Text Gradient: Cyan → Pink -->
+    <!-- Text Gradient: Cyan → Purple -->
     <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#00F0FF"/>
-      <stop offset="100%" stop-color="#FF0080"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#9D4EDD"/>
     </linearGradient>
   </defs>
   
-  <!-- Hexagon Outline -->
+  <!-- Hexagon Outline (Cyan) -->
   <path 
     d="M 120 45 L 165 75 L 165 125 L 120 155 L 75 125 L 75 75 Z" 
     stroke="url(#hexGrad)" 
-    stroke-width="4" 
+    stroke-width="3" 
     fill="none"
     stroke-linejoin="miter"/>
   
-  <!-- Dashed grid lines in Teal (network/digital theme) -->
-  <g opacity="0.35" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="4,6">
+  <!-- Dashed cyan lines (3D/network effect) -->
+  <g opacity="0.4" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="3,5">
     <line x1="120" y1="45" x2="120" y2="100"/>
     <line x1="165" y1="75" x2="120" y2="100"/>
     <line x1="165" y1="125" x2="120" y2="100"/>
     <line x1="120" y1="155" x2="120" y2="100"/>
     <line x1="75" y1="125" x2="120" y2="100"/>
     <line x1="75" y1="75" x2="120" y2="100"/>
-    <!-- Horizontal/vertical grid -->
-    <line x1="95" y1="75" x2="145" y2="75"/>
-    <line x1="95" y1="100" x2="145" y2="100"/>
-    <line x1="95" y1="125" x2="145" y2="125"/>
-    <line x1="95" y1="87.5" x2="145" y2="87.5"/>
-    <line x1="95" y1="112.5" x2="145" y2="112.5"/>
   </g>
   
-  <!-- Blocky Angular "S" with thick stroke -->
+  <!-- Angular "S" with exactly 5 segments -->
   <path 
-    d="M 135 75 
-       L 105 75 
-       L 100 80 
-       L 100 88 
-       L 105 93 
-       L 130 93 
-       L 135 98
-       L 135 105
-       L 110 105
-       L 105 110
-       L 105 120
-       L 110 125
+    d="M 105 75 
+       L 135 75
+       L 135 90
+       L 115 90
+       L 115 95
+       L 135 95
+       L 135 110
+       L 115 110
+       L 115 125
        L 140 125"
     stroke="url(#sGrad)" 
-    stroke-width="10" 
+    stroke-width="12" 
     fill="none"
     stroke-linecap="square"
     stroke-linejoin="miter"/>
   
-  <!-- PrismaFi Text -->
+  <!-- PrismaFi Text (Cyan → Purple gradient) -->
   <text 
     x="120" 
     y="185" 
@@ -79,27 +70,27 @@
     PrismaFi
   </text>
   
-  <!-- Subtitle: CYPHERPUNK HACKATHON -->
+  <!-- Subtitle: CYPHERPUNK HACKATHON (Orange/Terracotta) -->
   <text 
     x="120" 
     y="205" 
     font-family="'Prompt', 'Inter', system-ui, sans-serif" 
     font-size="10" 
     font-weight="600" 
-    fill="#FF7A2F" 
+    fill="#D2691E" 
     text-anchor="middle"
     letter-spacing="2.5">
     CYPHERPUNK HACKATHON
   </text>
   
-  <!-- Subtitle: SOLANA -->
+  <!-- Subtitle: SOLANA (Orange/Terracotta) -->
   <text 
     x="120" 
     y="220" 
     font-family="'Prompt', 'Inter', system-ui, sans-serif" 
     font-size="10" 
     font-weight="600" 
-    fill="#FF7A2F" 
+    fill="#D2691E" 
     text-anchor="middle"
     letter-spacing="2.5">
     • SOLANA •
