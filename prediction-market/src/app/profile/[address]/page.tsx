@@ -12,6 +12,7 @@ import { fetchAllMarketsDirect, fetchAllUserBets, calculateUserStats } from '@/l
 import { getUserRank } from '@/lib/program/leaderboard';
 import { useCallback, useState } from 'react';
 import { TrendingUp, Award, Grid3x3 } from 'lucide-react';
+import { PublicKey } from '@solana/web3.js';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -24,10 +25,13 @@ export default function ProfilePage() {
   // Fetch user data
   const fetchUserData = useCallback(async () => {
     try {
+      // Convert string address to PublicKey
+      const userPubkey = new PublicKey(userAddress);
+      
       // Fetch all data in parallel
       const [allMarkets, userBets, rank] = await Promise.all([
         fetchAllMarketsDirect(),
-        fetchAllUserBets(userAddress),
+        fetchAllUserBets(userPubkey),
         getUserRank(userAddress),
       ]);
 
