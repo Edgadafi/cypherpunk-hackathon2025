@@ -8,7 +8,7 @@ import MarketCard from '@/components/markets/MarketCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRealTimeData } from '@/hooks/useRealTimeData';
 import RealTimeStatus from '@/components/common/RealTimeStatus';
-import { fetchAllMarketsDirect, fetchAllUserBets, calculateUserStats } from '@/lib/program/direct-read';
+import { fetchAllMarketsDirect, fetchAllUserBets, calculateUserStats, type MarketAccount } from '@/lib/program/direct-read';
 import { getUserRank } from '@/lib/program/leaderboard';
 import { useCallback, useState } from 'react';
 import { TrendingUp, Award, Grid3x3 } from 'lucide-react';
