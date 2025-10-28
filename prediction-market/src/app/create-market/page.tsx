@@ -326,13 +326,13 @@ export default function CreateMarketPage() {
                     )}
                   </button>
                 </div>
-              </form>
+            </form>
 
-          {/* Preview Section */}
-          {showPreview && (
-            <div className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-6">
+            {/* Preview Section */}
+            {showPreview && (
+              <div className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-white mb-4">
-                🎯 Market Preview
+                  🎯 Market Preview
                 </h2>
 
                 {formData.question ? (
@@ -343,14 +343,14 @@ export default function CreateMarketPage() {
                       <h3 className="text-white font-bold text-lg">
                         {formData.question}
                       </h3>
-                    <span className="inline-block mt-2 px-3 py-1 bg-purple-500/20 text-purple-300 rounded text-xs font-medium">
-                      YES/NO MARKET
-                        </span>
-                      </div>
+                      <span className="inline-block mt-2 px-3 py-1 bg-purple-500/20 text-purple-300 rounded text-xs font-medium">
+                        YES/NO MARKET
+                      </span>
+                    </div>
 
-                  {/* Odds Preview */}
+                    {/* Odds Preview */}
                     <div>
-                    <p className="text-gray-400 text-xs mb-2">INITIAL ODDS</p>
+                      <p className="text-gray-400 text-xs mb-2">INITIAL ODDS</p>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
                           <p className="text-green-400 text-xs mb-1">YES</p>
@@ -367,97 +367,97 @@ export default function CreateMarketPage() {
                       </div>
                     </div>
 
-                  {/* Description */}
-                  {formData.description && (
-                    <div>
-                      <p className="text-gray-400 text-xs mb-1">
-                        RESOLUTION CRITERIA
-                      </p>
-                      <p className="text-gray-300 text-sm">
-                        {formData.description}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Category & End Date */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-800">
-                    {formData.category && (
-                      <span className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded font-medium">
-                        {formData.category}
-                      </span>
-                    )}
-                    {formData.endDate && (
+                    {/* Description */}
+                    {formData.description && (
                       <div>
-                        <p className="text-gray-400 text-xs">ENDS</p>
-                        <p className="text-white text-sm font-semibold">
-                          {getEndDateTime()?.toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
+                        <p className="text-gray-400 text-xs mb-1">
+                          RESOLUTION CRITERIA
+                        </p>
+                        <p className="text-gray-300 text-sm">
+                          {formData.description}
                         </p>
                       </div>
                     )}
-                  </div>
+
+                    {/* Category & End Date */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+                      {formData.category && (
+                        <span className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded font-medium">
+                          {formData.category}
+                        </span>
+                      )}
+                      {formData.endDate && (
+                        <div>
+                          <p className="text-gray-400 text-xs">ENDS</p>
+                          <p className="text-white text-sm font-semibold">
+                            {getEndDateTime()?.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                  <div className="text-5xl mb-4">🎯</div>
+                    <div className="text-5xl mb-4">🎯</div>
                     <p className="text-gray-400">
                       Fill out the form to see a preview
                     </p>
                   </div>
                 )}
               </div>
-          )}
+            )}
 
-          {/* Guidelines */}
-          <div className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <h3 className="text-white font-bold mb-4">
-              📋 Market Creation Guidelines
-            </h3>
-            <ul className="space-y-2 text-gray-300 text-sm">
-              <li className="flex items-start gap-2">
-                <span className="text-green-400">✓</span>
-                <span>
-                  Questions must be clear, unambiguous, and answerable with YES
-                  or NO
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-400">✓</span>
-                <span>
-                  Include specific resolution criteria and data sources in the
-                  description
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-400">✓</span>
-                <span>Set a realistic end date for market resolution</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-400">✓</span>
-                <span>
-                  Best for: political promises, public projects, institutional
-                  commitments
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
-                <span>
-                  Avoid subjective questions or questions without clear
-                  verification
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
-                <span>
-                  Don't create duplicate markets or markets on illegal
-                  activities
-                </span>
-              </li>
-            </ul>
-          </div>
+            {/* Guidelines */}
+            <div className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-6">
+              <h3 className="text-white font-bold mb-4">
+                📋 Market Creation Guidelines
+              </h3>
+              <ul className="space-y-2 text-gray-300 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>
+                    Questions must be clear, unambiguous, and answerable with YES
+                    or NO
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>
+                    Include specific resolution criteria and data sources in the
+                    description
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Set a realistic end date for market resolution</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>
+                    Best for: political promises, public projects, institutional
+                    commitments
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400">✗</span>
+                  <span>
+                    Avoid subjective questions or questions without clear
+                    verification
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400">✗</span>
+                  <span>
+                    Don't create duplicate markets or markets on illegal
+                    activities
+                  </span>
+                </li>
+              </ul>
+            </div>
           ) : (
             /* Oracle Market Form */
             <div className="space-y-8">
