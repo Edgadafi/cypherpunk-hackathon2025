@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/layout/Layout'
 import WalletInfo from '@/components/wallet/WalletInfo'
@@ -277,6 +277,7 @@ export default function CreateMarketPage() {
 
           {/* Conditional Form Rendering */}
           {marketType === 'standard' ? (
+            <>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Market Form */}
               <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
@@ -458,6 +459,7 @@ export default function CreateMarketPage() {
                 </li>
               </ul>
             </div>
+            </>
           ) : (
             /* Oracle Market Form */
             <div className="space-y-8">
