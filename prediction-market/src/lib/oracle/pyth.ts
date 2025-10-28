@@ -59,7 +59,7 @@ export async function fetchPythPrice(feedIdHex: string): Promise<PriceData | nul
     }
     
     const priceFeed = priceFeeds[0];
-    const price = priceFeed.price; // HermesClient returns price object directly
+    const price = priceFeed.price as any; // Type assertion for Pyth price object
     
     return {
       price: Number(price.price) * Math.pow(10, price.expo), // Convert to actual price
