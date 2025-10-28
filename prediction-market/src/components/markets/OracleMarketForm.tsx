@@ -23,6 +23,12 @@ export default function OracleMarketForm() {
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreate = async () => {
+    // Prevent multiple calls
+    if (isCreating) {
+      console.log('Already creating market, ignoring duplicate call');
+      return;
+    }
+
     if (!wallet) {
       toast.error('Please connect your wallet');
       return;
@@ -75,6 +81,11 @@ export default function OracleMarketForm() {
     try {
       setIsCreating(true);
       
+      console.log('🚀 Starting oracle market creation...');
+      console.log('  Feed:', oracleConfig.feedId);
+      console.log('  Threshold:', oracleConfig.threshold);
+      console.log('  Comparison:', oracleConfig.comparison);
+      
       const result = await createMarketDirect(
         wallet,
         question,
@@ -86,7 +97,13 @@ export default function OracleMarketForm() {
         oracleConfig.comparison
       );
 
-      toast.success(`Oracle market created! 🔮\nMarket: ${result.marketPubkey.toBase58().slice(0, 8)}...`);
+      console.log('✅ Market created successfully!');
+      console.log('  Market address:', result.marketPubkey.toBase58());
+      console.log('  Transaction:', result.signature);
+
+      toast.success(`Oracle market created! 🔮\nMarket: ${result.marketPubkey.toBase58().slice(0, 8)}...\nTx: ${result.signature.slice(0, 8)}...`, {
+        duration: 6000
+      });
       
       // Reset form
       setQuestion('');
@@ -98,8 +115,17 @@ export default function OracleMarketForm() {
       setComparison(0);
       
     } catch (error: any) {
-      console.error('Error creating oracle market:', error);
-      toast.error(error?.message || 'Failed to create oracle market');
+      console.error('❌ Error creating oracle market:', error);
+      
+      // Better error message
+      let errorMessage = 'Failed to create oracle market';
+      if (error?.message?.includes('already been processed')) {
+        errorMessage = 'Transaction already processed. Please wait a moment and try again.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage, { duration: 5000 });
     } finally {
       setIsCreating(false);
     }
@@ -109,10 +135,10 @@ export default function OracleMarketForm() {
   const comparisonLabel = comparison === 0 ? 'above' : comparison === 1 ? 'below' : 'equal to';
 
   return (
-    <div className="bg-white border-2 border-black p-6">
+    <div className="bg-gray-50 border-2 border-black p-6">
       <div className="flex items-center gap-3 mb-4">
         <TrendingUp className="w-6 h-6 text-blue-600" />
-        <h2 className="text-2xl font-bold">Create Oracle Market</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Create Oracle Market</h2>
         <span className="text-xs bg-blue-600 text-white px-2 py-1 font-bold">
           AUTO-RESOLVE
         </span>
@@ -134,7 +160,7 @@ export default function OracleMarketForm() {
       <div className="space-y-6">
         {/* Market Question */}
         <div>
-          <label className="block text-sm font-bold mb-2">
+          <label className="block text-sm font-bold mb-2 text-gray-900">
             Market Question <span className="text-red-600">*</span>
           </label>
           <input
@@ -152,7 +178,7 @@ export default function OracleMarketForm() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-bold mb-2">
+          <label className="block text-sm font-bold mb-2 text-gray-900">
             Resolution Criteria <span className="text-red-600">*</span>
           </label>
           <textarea
@@ -170,7 +196,7 @@ export default function OracleMarketForm() {
         {/* End Date & Time */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold mb-2">
+            <label className="block text-sm font-bold mb-2 text-gray-900">
               <Clock className="w-4 h-4 inline mr-1" />
               End Date <span className="text-red-600">*</span>
             </label>
@@ -182,7 +208,7 @@ export default function OracleMarketForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-bold mb-2">
+            <label className="block text-sm font-bold mb-2 text-gray-900">
               End Time (UTC) <span className="text-red-600">*</span>
             </label>
             <input
@@ -203,7 +229,7 @@ export default function OracleMarketForm() {
 
           {/* Price Feed Selection */}
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2">
+            <label className="block text-sm font-bold mb-2 text-gray-900">
               Price Feed <span className="text-red-600">*</span>
             </label>
             <select
@@ -222,7 +248,7 @@ export default function OracleMarketForm() {
 
           {/* Threshold Price */}
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2">
+            <label className="block text-sm font-bold mb-2 text-gray-900">
               <DollarSign className="w-4 h-4 inline mr-1" />
               Target Price (USD) <span className="text-red-600">*</span>
             </label>
@@ -242,7 +268,7 @@ export default function OracleMarketForm() {
 
           {/* Comparison Type */}
           <div>
-            <label className="block text-sm font-bold mb-2">
+            <label className="block text-sm font-bold mb-2 text-gray-900">
               Condition <span className="text-red-600">*</span>
             </label>
             <select

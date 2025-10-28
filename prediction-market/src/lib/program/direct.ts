@@ -209,17 +209,34 @@ export async function createMarketDirect(
   // Create and send transaction
   const transaction = new Transaction().add(instruction);
   transaction.feePayer = wallet.publicKey;
-  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+  
+  // Get latest blockhash ONCE and store it
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash(CONNECTION_CONFIG.commitment);
+  transaction.recentBlockhash = blockhash;
+  
+  console.log("  Blockhash:", blockhash.slice(0, 8) + "...");
+  console.log("  Last valid block height:", lastValidBlockHeight);
   
   // Sign transaction
   transaction.partialSign(marketKeypair);
   const signedTx = await wallet.signTransaction(transaction);
   
-  // Send transaction
-  const signature = await connection.sendRawTransaction(signedTx.serialize());
+  // Send transaction with proper options
+  const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: CONNECTION_CONFIG.commitment,
+    maxRetries: 2
+  });
   
-  // Confirm transaction
-  await connection.confirmTransaction(signature, CONNECTION_CONFIG.commitment);
+  console.log("  Transaction sent:", signature);
+  console.log("  Confirming...");
+  
+  // Confirm transaction with the same blockhash we used
+  await connection.confirmTransaction({
+    signature,
+    blockhash,
+    lastValidBlockHeight
+  }, CONNECTION_CONFIG.commitment);
   
   console.log("✅ Market created! Tx:", signature);
   
