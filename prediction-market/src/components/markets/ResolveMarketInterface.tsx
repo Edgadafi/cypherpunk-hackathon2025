@@ -22,6 +22,7 @@ export default function ResolveMarketInterface({
   const [selectedOutcome, setSelectedOutcome] = useState<boolean | null>(null)
   const [isCheckingAuthority, setIsCheckingAuthority] = useState(true)
   const [isAuthority, setIsAuthority] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<any>(null)
 
   // Verify authority from blockchain
   useEffect(() => {
@@ -52,9 +53,20 @@ export default function ResolveMarketInterface({
           console.log('  Market end time:', new Date(marketData.endTime * 1000))
           console.log('  Current time:', new Date())
           console.log('  Has expired:', Date.now() > marketData.endTime * 1000)
+          
+          // Save debug info for UI display
+          setDebugInfo({
+            marketAuthority: marketData.authority.toString(),
+            userWallet: wallet.publicKey.toString(),
+            isAuthority: isMarketAuthority,
+            marketEndTime: new Date(marketData.endTime * 1000).toLocaleString(),
+            hasExpired: Date.now() > marketData.endTime * 1000,
+            resolved: marketData.resolved,
+          })
         } else {
           console.log('  ❌ No market data returned')
           setIsAuthority(false)
+          setDebugInfo({ error: 'No market data returned from blockchain' })
         }
       } catch (error) {
         console.error('  ❌ Error checking authority:', error)
@@ -162,7 +174,51 @@ export default function ResolveMarketInterface({
 
   // Don't show if user is not the authority
   if (!isAuthority) {
-    return null
+    console.log('  ⚠️ ResolveMarketInterface: User is NOT authority, component hidden')
+    // Always show debug info to help diagnose the issue
+    return (
+      <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-xl p-6">
+        <h3 className="text-yellow-300 font-bold text-lg mb-4">
+          🔒 Authority Check Failed
+        </h3>
+        <p className="text-yellow-200/80 text-sm mb-4">
+          Only the market creator can resolve this market.
+        </p>
+        {debugInfo && (
+          <div className="bg-black/40 rounded-lg p-4 text-xs font-mono space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Market Creator:</span>
+              <span className="text-white">{debugInfo.marketAuthority?.slice(0, 8)}...{debugInfo.marketAuthority?.slice(-8)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Your Wallet:</span>
+              <span className="text-white">{debugInfo.userWallet?.slice(0, 8)}...{debugInfo.userWallet?.slice(-8)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Match:</span>
+              <span className={debugInfo.isAuthority ? 'text-green-400' : 'text-red-400'}>
+                {debugInfo.isAuthority ? '✅ YES' : '❌ NO'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Expired:</span>
+              <span className={debugInfo.hasExpired ? 'text-green-400' : 'text-yellow-400'}>
+                {debugInfo.hasExpired ? '✅ YES' : '⏰ NO'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Resolved:</span>
+              <span className={debugInfo.resolved ? 'text-blue-400' : 'text-gray-400'}>
+                {debugInfo.resolved ? 'YES' : 'NO'}
+              </span>
+            </div>
+          </div>
+        )}
+        <p className="text-gray-500 text-xs mt-4">
+          If you believe you are the creator, check Solana Explorer to verify the market authority address.
+        </p>
+      </div>
+    )
   }
 
   // If already resolved
