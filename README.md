@@ -38,10 +38,30 @@ Traditional prediction markets suffer from opacity and trust issues. You never k
 
 ### 🎯 Core Trading
 - **Create Markets** - Anyone can create prediction markets with custom questions
-- **Binary Betting** - Place bets on Yes/No outcomes with real SOL
+- **Binary Betting** - Place bets on Yes/NO outcomes with real SOL
 - **Market Resolution** - Market creators resolve with the final outcome
 - **Claim Winnings** - Winners get proportional payouts based on pool distribution
 - **Real-Time Odds** - Live probability updates as bets come in
+
+### 🔮 **NEW: Oracle-Powered Markets** (Pyth Network Integration)
+- **Trustless Resolution** - Markets automatically resolve using real-world price data from Pyth Network
+- **Zero Human Intervention** - No manual resolution needed, eliminates manipulation risk
+- **Instant Settlements** - Resolves immediately when market expires with latest price feed
+- **Verifiable Outcomes** - Anyone can verify the Pyth price feed used for resolution
+- **Price Feeds Available**:
+  - 📈 BTC/USD - Bitcoin price markets
+  - 📊 ETH/USD - Ethereum price markets
+  - ⚡ SOL/USD - Solana price markets
+  - 💵 Stablecoin pairs (USDC, USDT)
+  - 🪙 Top altcoins (BNB, ADA, MATIC)
+- **Flexible Conditions** - Set markets for price above/below/equals specific thresholds
+- **Real-Time Price Display** - See current Pyth price vs your threshold live on market page
+- **Auto-Resolve Button** - Anyone can trigger resolution after expiry (fully permissionless)
+
+**Example Oracle Markets:**
+- "Will BTC reach $100,000 by Dec 31, 2025?" → Auto-resolves YES/NO based on Pyth price
+- "Will ETH stay above $3,500 for next 24 hours?" → Trustless verification
+- "SOL price above $200 on Jan 1, 2026?" → Instant settlement at exact time
 
 ### 🤖 AI-Powered Insights (Swarms Integration)
 - **Multi-Agent Analysis** - Three specialized AI agents working together
@@ -281,6 +301,39 @@ Visit `http://localhost:3000`
 4. Winnings transferred to your wallet
 5. Bet marked as claimed
 
+### 🔮 Using Oracle Markets (NEW!)
+
+**Creating an Oracle Market:**
+1. Click "Create Market"
+2. Select "🔮 Oracle Market" tab
+3. Choose asset (BTC/USD, ETH/USD, SOL/USD, etc.)
+4. Set threshold price (e.g., $100,000 for BTC)
+5. Choose comparison (Above / Below / Equals)
+6. Set end date/time when resolution occurs
+7. Add question and description
+8. Confirm and deploy
+
+**Betting on Oracle Markets:**
+- Same as standard markets
+- See real-time Pyth price updates
+- Threshold and current price displayed
+- "Would Resolve As" indicator shows prediction
+
+**Auto-Resolution:**
+1. After end time, market is ready to resolve
+2. Anyone can click "Auto-Resolve with Oracle"
+3. Smart contract fetches Pyth price feed
+4. Compares price vs threshold using your condition
+5. Market resolves YES or NO instantly
+6. Winners claim as usual
+
+**Benefits:**
+- ✅ No trust in market creator needed
+- ✅ No waiting for manual resolution
+- ✅ Cryptographically verifiable outcome
+- ✅ Zero manipulation risk
+- ✅ Instant settlement
+
 ---
 
 ## 📊 Key Metrics & Stats
@@ -316,6 +369,7 @@ Visit `http://localhost:3000`
 - [x] Real-time updates
 - [x] Social features
 - [x] Leaderboard & activity feed
+- [x] **Oracle-powered auto-resolution (Pyth Network)** 🆕
 
 ### 🚧 Phase 2: Enhanced UX (In Progress)
 - [ ] Advanced charts & analytics
