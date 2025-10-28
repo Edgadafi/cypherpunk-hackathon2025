@@ -18,9 +18,28 @@ const prompt = Prompt({
 })
 
 export const metadata: Metadata = {
-  title: 'PrismaFi | Your own Prediction Markets on Solana',
+  title: 'PrismaFi | Transparent Prediction Markets for Social Impact',
   description:
-    'Generate your prediction market in 3 steps. Put your price for truth. 95% privacy with on-chain resolution and only 0.5% fees.',
+    'Building transparent prediction markets for social impact across LATAM. Turn accountability into a public good on Solana.',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0B0E13' },
+  ],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'PrismaFi',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 export default function RootLayout({
