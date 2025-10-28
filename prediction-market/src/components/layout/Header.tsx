@@ -5,8 +5,11 @@ import Link from 'next/link'
 import { Search, Menu, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import WalletButton from './WalletButton'
+import { ThemeToggle } from '../common/ThemeToggle'
+import { useTheme } from '@/contexts/ThemeContext'
 
 const Header = () => {
+  const { theme } = useTheme()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -33,9 +36,13 @@ const Header = () => {
     <header
       className={clsx(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
-          ? 'bg-black/80 backdrop-blur-md border-b border-gray-800'
-          : 'bg-black/60 backdrop-blur-sm'
+        theme === 'dark'
+          ? isScrolled
+            ? 'bg-black/80 backdrop-blur-md border-b border-gray-800'
+            : 'bg-black/60 backdrop-blur-sm'
+          : isScrolled
+            ? 'bg-white/80 backdrop-blur-md border-b border-gray-200'
+            : 'bg-white/60 backdrop-blur-sm'
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,7 +51,7 @@ const Header = () => {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <img
-                src="/images/prismafi-logo.svg"
+                src="/images/prismafi-logo.png"
                 alt="PrismaFi"
                 className="h-10 w-auto brightness-100 hover:brightness-110 transition-all"
               />
@@ -57,7 +64,12 @@ const Header = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-300 hover:text-white transition-colors duration-200 font-medium"
+                className={clsx(
+                  'transition-colors duration-200 font-medium',
+                  theme === 'dark'
+                    ? 'text-gray-300 hover:text-white'
+                    : 'text-gray-700 hover:text-gray-900'
+                )}
               >
                 {item.name}
               </Link>
@@ -68,18 +80,27 @@ const Header = () => {
           <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
+                <Search className={clsx(
+                  'h-4 w-4',
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                )} />
               </div>
               <input
                 type="text"
                 placeholder="Search markets..."
-                className="block w-full pl-10 pr-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                className={clsx(
+                  'block w-full pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200',
+                  theme === 'dark'
+                    ? 'bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400'
+                    : 'bg-gray-100 border border-gray-300 text-gray-900 placeholder-gray-500'
+                )}
               />
             </div>
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             <WalletButton />
           </div>
 
@@ -87,7 +108,12 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-300 hover:text-white transition-colors duration-200"
+              className={clsx(
+                'transition-colors duration-200',
+                theme === 'dark'
+                  ? 'text-gray-300 hover:text-white'
+                  : 'text-gray-700 hover:text-gray-900'
+              )}
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -101,17 +127,30 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-900/95 backdrop-blur-md rounded-lg mt-2 border border-gray-800">
+            <div className={clsx(
+              'px-2 pt-2 pb-3 space-y-1 backdrop-blur-md rounded-lg mt-2',
+              theme === 'dark'
+                ? 'bg-gray-900/95 border border-gray-800'
+                : 'bg-white/95 border border-gray-200'
+            )}>
               {/* Mobile Search */}
               <div className="px-3 py-2">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-400" />
+                    <Search className={clsx(
+                      'h-4 w-4',
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    )} />
                   </div>
                   <input
                     type="text"
                     placeholder="Search markets..."
-                    className="block w-full pl-10 pr-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className={clsx(
+                      'block w-full pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                      theme === 'dark'
+                        ? 'bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400'
+                        : 'bg-gray-100 border border-gray-300 text-gray-900 placeholder-gray-500'
+                    )}
                   />
                 </div>
               </div>
@@ -121,16 +160,24 @@ const Header = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors duration-200"
+                  className={clsx(
+                    'block px-3 py-2 rounded-lg transition-colors duration-200',
+                    theme === 'dark'
+                      ? 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
 
-              {/* Mobile Wallet Button */}
-              <div className="px-3 py-2">
-                <WalletButton />
+              {/* Mobile Actions */}
+              <div className="px-3 py-2 flex items-center gap-3">
+                <ThemeToggle />
+                <div className="flex-1">
+                  <WalletButton />
+                </div>
               </div>
             </div>
           </div>

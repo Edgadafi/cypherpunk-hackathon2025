@@ -31,7 +31,7 @@ const HeroSection = () => {
           {/* Logo */}
           <div className="mb-8 flex justify-center">
             <img 
-              src="/images/prismafi-logo.svg" 
+              src="/images/prismafi-logo.png" 
               alt="PrismaFi" 
               className="h-72 w-auto"
             />
@@ -40,7 +40,7 @@ const HeroSection = () => {
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Accountability Markets for LATAM
+              Building Transparent Prediction Markets for Social Impact Across LATAM.
             </span>
             <br />
             <span className="text-gray-400 text-2xl sm:text-3xl lg:text-4xl">

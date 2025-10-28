@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
+/* PrismaFi Brand Kit - Official Colors */
 :root {
+  /* Light Mode Colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0B0E13;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  
+  /* Brand Colors (consistent across themes) */
+  --color-cyan: #00F0FF;
+  --color-magenta: #FF0080;
+  --color-orange: #FF7A2F;
+  --color-purple: #8B5CF6;
+  --color-dark: #0B0E13;
+  
+  /* Gradient Stops */
+  --gradient-from: var(--color-cyan);
+  --gradient-via: var(--color-magenta);
+  --gradient-to: var(--color-orange);
+}
+
+/* Dark Mode Colors */
+[data-theme="dark"] {
+  --background: #0B0E13;
+  --foreground: #ffffff;
+  --card-bg: #1a1f2e;
+  --card-border: #2a3142;
 }
 
 @theme inline {
+  /* Base Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  
+  /* Brand Colors */
+  --color-brand-cyan: var(--color-cyan);
+  --color-brand-magenta: var(--color-magenta);
+  --color-brand-orange: var(--color-orange);
+  --color-brand-purple: var(--color-purple);
+  --color-brand-dark: var(--color-dark);
+  
+  /* Typography */
+  --font-sans: var(--font-prompt), var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
