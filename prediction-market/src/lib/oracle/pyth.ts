@@ -5,7 +5,7 @@
  * resolving prediction markets automatically based on real-world prices
  */
 
-import { PriceServiceConnection } from '@pythnetwork/price-service-client';
+import { HermesClient } from '@pythnetwork/hermes-client';
 
 // Pyth Hermes endpoint (mainnet and devnet)
 const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_PYTH_ENDPOINT || 'https://hermes.pyth.network';
@@ -42,7 +42,7 @@ export interface PriceData {
  */
 export async function fetchPythPrice(feedIdHex: string): Promise<PriceData | null> {
   try {
-    const connection = new PriceServiceConnection(PYTH_ENDPOINT);
+    const connection = new HermesClient(PYTH_ENDPOINT);
     
     // Ensure feed ID has 0x prefix
     const formattedFeedId = feedIdHex.startsWith('0x') ? feedIdHex : `0x${feedIdHex}`;
@@ -75,7 +75,7 @@ export async function fetchPythPrice(feedIdHex: string): Promise<PriceData | nul
  */
 export async function fetchMultiplePrices(feedIdHexArray: string[]): Promise<Map<string, PriceData>> {
   try {
-    const connection = new PriceServiceConnection(PYTH_ENDPOINT);
+    const connection = new HermesClient(PYTH_ENDPOINT);
     
     // Format all feed IDs
     const formattedFeedIds = feedIdHexArray.map(id =>
@@ -111,7 +111,7 @@ export async function fetchMultiplePrices(feedIdHexArray: string[]): Promise<Map
  */
 export async function getPriceUpdateVaa(feedIdHex: string): Promise<string[] | null> {
   try {
-    const connection = new PriceServiceConnection(PYTH_ENDPOINT);
+    const connection = new HermesClient(PYTH_ENDPOINT);
     
     // Ensure feed ID has 0x prefix
     const formattedFeedId = feedIdHex.startsWith('0x') ? feedIdHex : `0x${feedIdHex}`;

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Layout from '@/components/layout/Layout'
 import WalletInfo from '@/components/wallet/WalletInfo'
 import BinaryMarketForm from '@/components/markets/BinaryMarketForm'
+import OracleMarketForm from '@/components/markets/OracleMarketForm'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { createMarketDirect } from '@/lib/program/direct'
@@ -31,6 +32,7 @@ export default function CreateMarketPage() {
   const wallet = useAnchorWallet()
   const router = useRouter()
 
+  const [marketType, setMarketType] = useState<'standard' | 'oracle'>('standard')
   const [formData, setFormData] = useState<FormData>({
     question: '',
     description: '',
@@ -233,20 +235,57 @@ export default function CreateMarketPage() {
               Create Prediction Market
             </h1>
             <p className="text-gray-400">
-              Create a YES/NO market about political promises, public projects, or
-              institutional commitments
+              Create a YES/NO market with manual or automatic oracle resolution
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Market Form */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-              <BinaryMarketForm
-                formData={formData}
-                errors={errors}
-                    onChange={handleChange}
-              />
+          {/* Market Type Tabs */}
+          <div className="mb-8">
+            <div className="flex gap-2 bg-gray-900 border border-gray-800 rounded-xl p-2">
+              <button
+                type="button"
+                onClick={() => setMarketType('standard')}
+                className={`flex-1 py-4 px-6 rounded-lg font-semibold transition-all ${
+                  marketType === 'standard'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                    : 'bg-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-2xl">📝</span>
+                  <span>Standard Market</span>
+                  <span className="text-xs opacity-75">Manual Resolution</span>
                 </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMarketType('oracle')}
+                className={`flex-1 py-4 px-6 rounded-lg font-semibold transition-all ${
+                  marketType === 'oracle'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white'
+                    : 'bg-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-2xl">🔮</span>
+                  <span>Oracle Market</span>
+                  <span className="text-xs opacity-75">Auto-Resolved by Pyth</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Conditional Form Rendering */}
+          {marketType === 'standard' ? (
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Market Form */}
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+                <BinaryMarketForm
+                  formData={formData}
+                  errors={errors}
+                  onChange={handleChange}
+                />
+              </div>
 
             {/* Creation Fee Info */}
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
@@ -419,6 +458,59 @@ export default function CreateMarketPage() {
               </li>
             </ul>
           </div>
+          ) : (
+            /* Oracle Market Form */
+            <div className="space-y-8">
+              <div className="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-xl p-6">
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">🔮</span>
+                  <div>
+                    <h3 className="text-white font-bold text-xl mb-2">
+                      Oracle-Powered Market
+                    </h3>
+                    <p className="text-blue-200 text-sm">
+                      This market will be automatically resolved using real-time price data from{' '}
+                      <span className="font-semibold">Pyth Network</span>. No manual intervention needed!
+                    </p>
+                  </div>
+                </div>
+                <OracleMarketForm />
+              </div>
+              
+              {/* Oracle Benefits */}
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+                <h3 className="text-white font-bold mb-4">
+                  ✨ Why Use Oracle Markets?
+                </h3>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span>
+                      <strong>Trustless</strong>: No human can manipulate the outcome
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span>
+                      <strong>Instant</strong>: Resolves immediately when time expires
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span>
+                      <strong>Verifiable</strong>: Anyone can verify the Pyth price feed
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span>
+                      <strong>Scalable</strong>: No manual resolution workload
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
