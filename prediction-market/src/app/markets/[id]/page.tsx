@@ -11,6 +11,9 @@ import OracleStatus from '@/components/markets/OracleStatus'
 import AutoResolveButton from '@/components/markets/AutoResolveButton'
 import ShareMarket from '@/components/social/ShareMarket'
 import RealTimeStatus from '@/components/common/RealTimeStatus'
+import { MarketChart } from '@/components/analytics/MarketChart'
+import { VolumeChart } from '@/components/analytics/VolumeChart'
+import { TradeHistory } from '@/components/analytics/TradeHistory'
 import { useWallet, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 import { fetchMarketDirect, lamportsToSOL } from '@/lib/program/direct-read'
@@ -127,6 +130,66 @@ export default function MarketDetailPage() {
   const endDate = new Date(market.endTime)
   const isExpired = endDate < new Date() && !market.resolved
 
+  // Generate mock analytics data based on current market state
+  const generateMockPriceData = () => {
+    const now = Date.now();
+    const startTime = market.createdAt.getTime();
+    const duration = now - startTime;
+    const points = 10;
+    
+    return Array.from({ length: points }, (_, i) => {
+      const timestamp = startTime + (duration / points) * i;
+      const progress = i / points;
+      // Simulate price evolution towards current odds
+      const yesPrice = 0.5 + (odds.yesOdds - 0.5) * progress + (Math.random() - 0.5) * 0.1;
+      return {
+        timestamp,
+        yesPrice: Math.max(0.1, Math.min(0.9, yesPrice)),
+        noPrice: Math.max(0.1, Math.min(0.9, 1 - yesPrice)),
+        volume: market.totalYesAmount + market.totalNoAmount,
+      };
+    });
+  };
+
+  const generateMockVolumeData = () => {
+    const now = Date.now();
+    const startTime = market.createdAt.getTime();
+    const duration = now - startTime;
+    const days = Math.ceil(duration / (1000 * 60 * 60 * 24));
+    const points = Math.min(days, 7); // Show last 7 days max
+    
+    return Array.from({ length: points }, (_, i) => {
+      const timestamp = startTime + (duration / points) * i;
+      const totalVol = market.totalYesAmount + market.totalNoAmount;
+      const dayVolume = totalVol / points;
+      return {
+        timestamp,
+        volume: dayVolume * (0.8 + Math.random() * 0.4),
+        yesVolume: (dayVolume * odds.yesOdds) * (0.8 + Math.random() * 0.4),
+        noVolume: (dayVolume * odds.noOdds) * (0.8 + Math.random() * 0.4),
+      };
+    });
+  };
+
+  const generateMockTradeHistory = () => {
+    const trades = [];
+    const tradeCount = Math.min(Math.floor((market.totalYesAmount + market.totalNoAmount) / 0.5), 20);
+    
+    for (let i = 0; i < tradeCount; i++) {
+      const side = Math.random() > odds.yesOdds ? 'no' : 'yes';
+      trades.push({
+        signature: `mock_${marketId}_${i}`,
+        trader: rawMarketData?.authority.toString() || `${Math.random().toString(36).substr(2, 40)}`,
+        side,
+        amount: 0.5 + Math.random() * 2,
+        timestamp: market.createdAt.getTime() + Math.random() * (Date.now() - market.createdAt.getTime()),
+        price: side === 'yes' ? odds.yesOdds : odds.noOdds,
+      });
+    }
+    
+    return trades.sort((a, b) => b.timestamp - a.timestamp);
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-black py-20 px-4">
@@ -241,9 +304,12 @@ export default function MarketDetailPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs mb-1">CREATOR</p>
-                    <p className="text-white font-bold font-mono text-sm">
+                    <Link 
+                      href={`/profile/${rawMarketData?.authority.toString() || 'unknown'}`}
+                      className="text-white font-bold font-mono text-sm hover:text-[#00F0FF] transition-colors"
+                    >
                       {market.creator}
-                    </p>
+                    </Link>
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs mb-1">ENDS</p>
@@ -331,46 +397,23 @@ export default function MarketDetailPage() {
                 onClaimed={refresh}
               />
 
-              {/* Activity Feed (Placeholder) */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-bold text-lg mb-4">
-                  Recent Activity
-                </h3>
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center">
-                          <span className="text-purple-300 text-sm">👤</span>
-                        </div>
-                        <div>
-                          <p className="text-white text-sm font-medium">
-                            User {String.fromCharCode(64 + i)}x...
-                            {String.fromCharCode(96 + i * 2)}
-                          </p>
-                          <p className="text-gray-400 text-xs">
-                            {i} hour{i > 1 ? 's' : ''} ago
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-white font-semibold">
-                          {(Math.random() * 5).toFixed(1)} SOL
-                        </p>
-                        <p
-                          className={`text-xs ${
-                            i % 2 === 0 ? 'text-green-400' : 'text-red-400'
-                          }`}
-                        >
-                          {i % 2 === 0 ? 'YES' : 'NO'}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              {/* Market Analytics - Charts */}
+              <div className="space-y-6">
+                <MarketChart 
+                  data={generateMockPriceData()} 
+                  title="Probability Over Time"
+                />
+                
+                <VolumeChart 
+                  data={generateMockVolumeData()} 
+                  title="Trading Volume"
+                />
+                
+                <TradeHistory 
+                  trades={generateMockTradeHistory()} 
+                  title="Recent Trades"
+                  maxItems={10}
+                />
               </div>
             </div>
 
