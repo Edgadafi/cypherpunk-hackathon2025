@@ -141,7 +141,8 @@ export default function MarketDetailPage() {
       const timestamp = startTime + (duration / points) * i;
       const progress = i / points;
       // Simulate price evolution towards current odds
-      const yesPrice = 0.5 + (odds.yesOdds - 0.5) * progress + (Math.random() - 0.5) * 0.1;
+      const targetYesOdds = odds.yesPercentage / 100; // Convert percentage to decimal
+      const yesPrice = 0.5 + (targetYesOdds - 0.5) * progress + (Math.random() - 0.5) * 0.1;
       return {
         timestamp,
         yesPrice: Math.max(0.1, Math.min(0.9, yesPrice)),
@@ -149,7 +150,7 @@ export default function MarketDetailPage() {
         volume: market.totalYesAmount + market.totalNoAmount,
       };
     });
-  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesOdds]);
+  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesPercentage]);
 
   const mockVolumeData = useMemo(() => {
     const now = Date.now();
@@ -162,33 +163,37 @@ export default function MarketDetailPage() {
       const timestamp = startTime + (duration / points) * i;
       const totalVol = market.totalYesAmount + market.totalNoAmount;
       const dayVolume = totalVol / points;
+      const yesOdds = odds.yesPercentage / 100; // Convert percentage to decimal
+      const noOdds = odds.noPercentage / 100; // Convert percentage to decimal
       return {
         timestamp,
         volume: dayVolume * (0.8 + Math.random() * 0.4),
-        yesVolume: (dayVolume * odds.yesOdds) * (0.8 + Math.random() * 0.4),
-        noVolume: (dayVolume * odds.noOdds) * (0.8 + Math.random() * 0.4),
+        yesVolume: (dayVolume * yesOdds) * (0.8 + Math.random() * 0.4),
+        noVolume: (dayVolume * noOdds) * (0.8 + Math.random() * 0.4),
       };
     });
-  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesOdds, odds.noOdds]);
+  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesPercentage, odds.noPercentage]);
 
   const mockTradeHistory = useMemo(() => {
     const trades = [];
     const tradeCount = Math.min(Math.floor((market.totalYesAmount + market.totalNoAmount) / 0.5), 20);
+    const yesOdds = odds.yesPercentage / 100; // Convert percentage to decimal
+    const noOdds = odds.noPercentage / 100; // Convert percentage to decimal
     
     for (let i = 0; i < tradeCount; i++) {
-      const side = Math.random() > odds.yesOdds ? 'no' : 'yes';
+      const side = Math.random() > yesOdds ? 'no' : 'yes';
       trades.push({
         signature: `mock_${marketId}_${i}`,
         trader: rawMarketData?.authority.toString() || `${Math.random().toString(36).substr(2, 40)}`,
         side,
         amount: 0.5 + Math.random() * 2,
         timestamp: market.createdAt.getTime() + Math.random() * (Date.now() - market.createdAt.getTime()),
-        price: side === 'yes' ? odds.yesOdds : odds.noOdds,
+        price: side === 'yes' ? yesOdds : noOdds,
       });
     }
     
     return trades.sort((a, b) => b.timestamp - a.timestamp);
-  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesOdds, odds.noOdds, marketId, rawMarketData?.authority]);
+  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesPercentage, odds.noPercentage, marketId, rawMarketData?.authority]);
 
   return (
     <Layout>
