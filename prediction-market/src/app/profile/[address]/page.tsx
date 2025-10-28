@@ -35,8 +35,16 @@ export default function ProfilePage() {
         getUserRank(userAddress),
       ]);
 
+      // Convert markets array to Map for calculateUserStats
+      const marketsMap = new Map<string, any>();
+      allMarkets.forEach(market => {
+        if (market.pubkey) {
+          marketsMap.set(market.pubkey.toString(), market);
+        }
+      });
+
       // Calculate user stats
-      const stats = calculateUserStats(userBets, allMarkets);
+      const stats = await calculateUserStats(userBets, marketsMap);
       
       // Get markets created by this user
       const createdMarkets = allMarkets.filter(
