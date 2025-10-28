@@ -36,10 +36,10 @@ export default function ProfilePage() {
       ]);
 
       // Convert markets array to Map for calculateUserStats
-      const marketsMap = new Map<string, any>();
+      const marketsMap = new Map<string, MarketAccount>();
       allMarkets.forEach(market => {
-        if (market.pubkey) {
-          marketsMap.set(market.pubkey.toString(), market);
+        if (market.address) {
+          marketsMap.set(market.address, market);
         }
       });
 
@@ -53,7 +53,7 @@ export default function ProfilePage() {
 
       // Transform to UI format
       const transformedMarkets = createdMarkets.map(m => ({
-        id: m.pubkey?.toString() || '',
+        id: m.address,
         question: m.question,
         description: m.description,
         category: 'Other' as const,
@@ -68,11 +68,11 @@ export default function ProfilePage() {
 
       // Transform user bets to market cards
       const userBetMarkets = userBets.map(bet => {
-        const market = allMarkets.find(m => m.pubkey?.toString() === bet.marketAddress);
+        const market = allMarkets.find(m => m.address === bet.market.toString());
         if (!market) return null;
         
         return {
-          id: bet.marketAddress,
+          id: bet.market.toString(),
           question: market.question,
           description: market.description,
           category: 'Other' as const,
