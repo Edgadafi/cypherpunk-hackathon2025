@@ -296,11 +296,34 @@ export default function MarketDetailPage() {
                 />
               )}
 
-              {/* Resolution Interface (for market creator) */}
-              <ResolveMarketInterface 
-                market={market} 
-                onResolved={refresh}
-              />
+              {/* Resolution Interface (for manual resolution - only for non-oracle markets) */}
+              {!rawMarketData?.oracleEnabled && (
+                <ResolveMarketInterface 
+                  market={market} 
+                  onResolved={refresh}
+                />
+              )}
+
+              {/* Oracle markets message (if user tries to resolve manually) */}
+              {rawMarketData?.oracleEnabled && !market.resolved && (
+                <div className="bg-blue-900/40 border border-blue-500/30 rounded-lg p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">🤖</div>
+                    <div>
+                      <h3 className="text-blue-300 font-bold text-lg mb-2">
+                        Oracle-Powered Market
+                      </h3>
+                      <p className="text-blue-200/80 text-sm mb-3">
+                        This market uses Pyth Network oracle for automatic resolution.
+                        Manual resolution is not available.
+                      </p>
+                      <p className="text-blue-300 text-sm font-semibold">
+                        → Use the "Auto-Resolve with Oracle" button above after the market expires.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Claim Winnings Interface */}
               <ClaimWinnings 

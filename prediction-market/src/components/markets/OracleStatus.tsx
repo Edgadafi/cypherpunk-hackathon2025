@@ -33,6 +33,17 @@ export default function OracleStatus({
   const feedName = getFeedName(feedIdHex);
   const comparisonLabel = getComparisonLabel(oracleComparison as ComparisonType);
 
+  // Convert i64 threshold (8 decimals) to actual price
+  const actualThreshold = oracleThreshold / 1e8;
+  
+  console.log('📊 OracleStatus:', {
+    feedName,
+    rawThreshold: oracleThreshold,
+    actualThreshold,
+    comparison: oracleComparison,
+    comparisonLabel
+  });
+
   useEffect(() => {
     if (!oracleEnabled) return;
 
@@ -43,9 +54,10 @@ export default function OracleStatus({
         setPriceData(price);
 
         if (price) {
+          // Use actualThreshold (converted from i64) for comparison
           const result = await wouldResolveAsYes(
             feedIdHex,
-            oracleThreshold,
+            actualThreshold,
             oracleComparison as ComparisonType
           );
           setWouldResolve(result);
@@ -61,12 +73,12 @@ export default function OracleStatus({
     const interval = setInterval(fetchPrice, 5000); // Update every 5s
 
     return () => clearInterval(interval);
-  }, [oracleEnabled, feedIdHex, oracleThreshold, oracleComparison]);
+  }, [oracleEnabled, feedIdHex, actualThreshold, oracleComparison]);
 
   if (!oracleEnabled) return null;
 
   const currentPrice = priceData?.price;
-  const priceMovement = currentPrice && currentPrice > oracleThreshold ? 'up' : 'down';
+  const priceMovement = currentPrice && currentPrice > actualThreshold ? 'up' : 'down';
   const timeDiff = endTime - Date.now() / 1000;
   const hasEnded = timeDiff <= 0;
 
@@ -121,7 +133,7 @@ export default function OracleStatus({
             <span className="text-sm font-bold text-gray-600">Target Price</span>
           </div>
           <div className="text-2xl font-bold text-gray-900">
-            {formatPrice(oracleThreshold, feedName)}
+            {formatPrice(actualThreshold, feedName)}
           </div>
           <div className="text-xs text-gray-500 mt-1">
             Condition: {comparisonLabel}
