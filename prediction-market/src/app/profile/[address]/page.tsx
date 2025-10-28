@@ -88,9 +88,14 @@ export default function ProfilePage() {
 
       return {
         stats: {
-          ...stats,
-          rank,
+          totalBets: stats.totalBets,
+          totalVolume: stats.totalWagered, // Map totalWagered to totalVolume
+          winRate: stats.winRate,
+          profitLoss: stats.profitLoss,
+          totalWon: stats.totalClaimed, // Use totalClaimed (actual SOL received)
+          totalLost: Math.max(0, stats.totalWagered - stats.totalClaimed), // Amount not returned (never negative)
           marketsCreated: createdMarkets.length,
+          rank,
         },
         createdMarkets: transformedMarkets,
         userBetMarkets: userBetMarkets as any[],
