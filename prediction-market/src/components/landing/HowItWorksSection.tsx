@@ -144,7 +144,10 @@ const HowItWorksSection = () => {
 
         {/* CTA */}
         <div className="mt-12 text-center">
-          <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-purple-500/50">
+          <button 
+            onClick={() => window.location.href = '/markets'}
+            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-purple-500/50 cursor-pointer"
+          >
             Start Now - It&apos;s Free →
           </button>
           <p className="text-gray-500 text-sm mt-4">

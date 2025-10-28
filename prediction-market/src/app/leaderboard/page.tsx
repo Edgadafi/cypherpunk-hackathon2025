@@ -129,6 +129,23 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-8 text-center mb-6">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-xl font-bold text-red-300 mb-2">Error al cargar</h2>
+            <p className="text-red-200/80 text-sm mb-4">
+              {error.message || 'No se pudo cargar el leaderboard'}
+            </p>
+            <button
+              onClick={refresh}
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+
         {/* Loading */}
         {isLoading && (
           <div className="text-center py-12">
@@ -141,7 +158,7 @@ export default function LeaderboardPage() {
         )}
 
         {/* Leaderboard Table */}
-        {!isLoading && (
+        {!isLoading && !error && (
           <>
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden mb-6">
               <LeaderboardTable
@@ -205,7 +222,7 @@ export default function LeaderboardPage() {
         )}
 
         {/* Empty State */}
-        {!isLoading && (leaderboardData?.entries.length || 0) === 0 && (
+        {!isLoading && !error && (leaderboardData?.entries.length || 0) === 0 && (
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-12 text-center">
             <div className="text-6xl mb-6">🏆</div>
             <h2 className="text-2xl font-bold text-white mb-4">No Traders Yet</h2>
