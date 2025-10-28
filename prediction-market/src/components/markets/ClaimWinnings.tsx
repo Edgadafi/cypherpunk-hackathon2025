@@ -28,7 +28,13 @@ const ClaimWinnings = ({ market, onClaimed }: ClaimWinningsProps) => {
   // Fetch user's bet and calculate winnings
   useEffect(() => {
     const fetchBetInfo = async () => {
+      console.log('💰 ClaimWinnings: Checking for winnings...')
+      console.log('  Market ID:', market.id)
+      console.log('  Wallet:', wallet?.publicKey?.toString())
+      console.log('  Market resolved:', market.resolved)
+      
       if (!wallet || !market.resolved) {
+        console.log('  ❌ No wallet or market not resolved')
         setIsLoading(false);
         return;
       }
@@ -39,10 +45,16 @@ const ClaimWinnings = ({ market, onClaimed }: ClaimWinningsProps) => {
         const bet = await fetchUserBet(wallet.publicKey, marketPubkey);
 
         if (!bet) {
-          console.log('No bet found for user');
+          console.log('  ❌ No bet found for user');
           setIsLoading(false);
           return;
         }
+        
+        console.log('  ✅ Bet found:', {
+          amount: bet.amount / 1e9,
+          outcome: bet.outcome ? 'YES' : 'NO',
+          claimed: bet.claimed
+        })
 
         setUserBet(bet);
 

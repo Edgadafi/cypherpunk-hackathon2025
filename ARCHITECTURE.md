@@ -20,7 +20,7 @@
 
 ## Overview
 
-Trepa is built as a **full-stack decentralized application** with three main layers:
+Trepa (PrismaFi) is built as a **full-stack decentralized application** with four main layers:
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -38,6 +38,12 @@ Trepa is built as a **full-stack decentralized application** with three main lay
 ┌─────────────────────────────────────────────────┐
 │         Solana Smart Contract (Rust)             │
 │      Anchor Framework + Program Instructions     │
+└─────────────────────────────────────────────────┘
+                  
+┌─────────────────────────────────────────────────┐
+│           AI Intelligence Layer (Swarms)         │
+│   Multi-Agent Orchestration for Market Insights  │
+│   SentimentAgent + DataAgent + StrategyAgent     │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -242,6 +248,132 @@ Layout
 │
 └── Footer
 ```
+
+---
+
+## AI Intelligence Layer
+
+### Swarms Multi-Agent Architecture
+
+PrismaFi integrates **Swarms** - a multi-agent AI orchestration platform - to provide market participants with intelligent insights that go beyond raw odds.
+
+### Agent Architecture
+
+```
+User Views Market
+       ↓
+MarketAnalyzer Component
+       ↓
+analyzeMarket(marketId, question, data)
+       ↓
+┌──────────────────────────────────────┐
+│   Swarms Orchestration Engine         │
+│                                       │
+│  ┌─────────────────────────────┐    │
+│  │     SentimentAgent           │    │
+│  │  - Scrapes social media      │    │
+│  │  - Analyzes sentiment (-1..1)│    │
+│  │  - Counts mentions           │    │
+│  │  - Identifies keywords       │    │
+│  └─────────────────────────────┘    │
+│                                       │
+│  ┌─────────────────────────────┐    │
+│  │     DataAgent                │    │
+│  │  - Queries blockchain data   │    │
+│  │  - Finds similar markets     │    │
+│  │  - Calculates win rates      │    │
+│  │  - Detects price patterns    │    │
+│  └─────────────────────────────┘    │
+│                                       │
+│  ┌─────────────────────────────┐    │
+│  │     StrategyAgent            │    │
+│  │  - Combines all signals      │    │
+│  │  - Recommends position       │    │
+│  │  - Calculates bet size       │    │
+│  │  - Assesses risk             │    │
+│  └─────────────────────────────┘    │
+│                                       │
+└──────────────┬────────────────────────┘
+               ↓
+       MarketInsight Object
+               ↓
+       UI Renders Analysis
+```
+
+### Implementation Details
+
+**File:** `src/lib/ai/swarms-analyzer.ts`
+
+The Swarms analyzer orchestrates three specialized agents:
+
+**1. SentimentAgent**
+```typescript
+// Analyzes social media sentiment
+interface SentimentAnalysis {
+  score: number;        // -1 (negative) to 1 (positive)
+  volume: number;       // Mention count
+  trending: boolean;    // Viral status
+  topKeywords: string[];
+  summary: string;
+}
+```
+
+**2. DataAgent**
+```typescript
+// Historical pattern recognition
+interface HistoricalAnalysis {
+  similarMarketsCount: number;
+  averageWinRate: number;
+  volumeComparison: number;
+  priceMovement: "bullish" | "bearish" | "neutral";
+  summary: string;
+}
+```
+
+**3. StrategyAgent**
+```typescript
+// Actionable recommendations
+interface StrategyRecommendation {
+  recommendedOutcome: "YES" | "NO" | "NEUTRAL";
+  optimalBetSize: number;     // % of portfolio
+  confidenceLevel: "HIGH" | "MEDIUM" | "LOW";
+  riskAssessment: string;
+  reasoning: string[];
+}
+```
+
+### UI Component
+
+**File:** `src/components/ai/MarketAnalyzer.tsx`
+
+The MarketAnalyzer component displays AI insights in a beautiful, brutalist interface:
+
+- Sentiment score with visual gauge
+- Historical data comparisons
+- Strategy recommendations with reasoning
+- Overall confidence score
+- Real-time updates as market evolves
+
+### Why Swarms?
+
+1. **Multi-agent orchestration** - Better than single LLM calls
+2. **Specialized agents** - Each focuses on one task (sentiment, data, strategy)
+3. **Parallel execution** - Faster than sequential analysis
+4. **Composable** - Easy to add new agents (NewsAgent, ChainAgent, etc.)
+5. **Production-ready** - API handles scaling, rate limits, error handling
+
+### Trade-offs
+
+**Pros:**
+- ✅ Unique differentiator vs competitors
+- ✅ Helps users make better decisions
+- ✅ Premium feature for monetization
+- ✅ Composable with any data source
+
+**Cons:**
+- ❌ API costs (mitigated by caching)
+- ❌ Latency (2-3 seconds per analysis)
+- ❌ Requires external service (fallback built-in)
 
 ---
 
@@ -629,4 +761,7 @@ The modular design allows us to iterate quickly while maintaining code quality.
 ---
 
 **Built with ❤️ for Cypherpunk Hackathon 2025**
+
+
+
 

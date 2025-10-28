@@ -26,7 +26,13 @@ export default function ResolveMarketInterface({
   // Verify authority from blockchain
   useEffect(() => {
     const checkAuthority = async () => {
+      console.log('🔐 ResolveMarketInterface: Checking authority...')
+      console.log('  Market ID:', market.id)
+      console.log('  Wallet:', wallet?.publicKey?.toString())
+      console.log('  Market resolved:', market.resolved)
+      
       if (!wallet) {
+        console.log('  ❌ No wallet connected')
         setIsAuthority(false)
         setIsCheckingAuthority(false)
         return
@@ -36,15 +42,22 @@ export default function ResolveMarketInterface({
         setIsCheckingAuthority(true)
         const marketData = await fetchMarketDirect(market.id) // market.id is already a string
         
+        console.log('  Market data fetched:', !!marketData)
         if (marketData) {
+          console.log('  Market authority:', marketData.authority.toString())
+          console.log('  User pubkey:', wallet.publicKey.toString())
           const isMarketAuthority = marketData.authority.equals(wallet.publicKey)
           setIsAuthority(isMarketAuthority)
-          console.log('Authority check:', isMarketAuthority ? '✅ User is authority' : '❌ User is not authority')
+          console.log('  Authority check:', isMarketAuthority ? '✅ User IS authority' : '❌ User is NOT authority')
+          console.log('  Market end time:', new Date(marketData.endTime * 1000))
+          console.log('  Current time:', new Date())
+          console.log('  Has expired:', Date.now() > marketData.endTime * 1000)
         } else {
+          console.log('  ❌ No market data returned')
           setIsAuthority(false)
         }
       } catch (error) {
-        console.error('Error checking authority:', error)
+        console.error('  ❌ Error checking authority:', error)
         setIsAuthority(false)
       } finally {
         setIsCheckingAuthority(false)

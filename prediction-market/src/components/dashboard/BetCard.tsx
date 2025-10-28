@@ -200,3 +200,7 @@ const BetCard = ({ bet }: BetCardProps) => {
 
 export default BetCard;
 
+
+
+
+

@@ -181,3 +181,7 @@ const LeaderboardTable = ({ entries, currentUserWallet }: LeaderboardTableProps)
 
 export default LeaderboardTable;
 
+
+
+
+

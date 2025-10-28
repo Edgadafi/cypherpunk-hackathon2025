@@ -43,6 +43,20 @@ Traditional prediction markets suffer from opacity and trust issues. You never k
 - **Claim Winnings** - Winners get proportional payouts based on pool distribution
 - **Real-Time Odds** - Live probability updates as bets come in
 
+### 🤖 AI-Powered Insights (Swarms Integration)
+- **Multi-Agent Analysis** - Three specialized AI agents working together
+- **SentimentAgent** - Analyzes social media sentiment and community discussions
+- **DataAgent** - Examines historical market patterns and win rates
+- **StrategyAgent** - Recommends optimal position sizing and confidence levels
+- **Actionable Insights** - Get AI reasoning, not just recommendations
+
+### 🔮 Oracle Resolution (Pyth Network Integration)
+- **Automatic Resolution** - Markets resolve automatically based on real-world price data
+- **Trustless** - No human bias or manipulation possible
+- **Instant** - Resolves immediately after end time
+- **Verifiable** - Anyone can verify the oracle price on-chain
+- **Price Feeds** - Support for BTC/USD, ETH/USD, SOL/USD, and more
+
 ### 📊 User Experience
 - **Personal Dashboard** - Track all your bets, stats, and P&L in one place
 - **Global Leaderboard** - See top traders ranked by win rate, ROI, and profit
@@ -84,10 +98,24 @@ Traditional prediction markets suffer from opacity and trust issues. You never k
 - Rust - Contract language
 - Anchor Framework - Development framework
 - UMA-style resolution - Optimistic oracle pattern
+- Pyth Network - Price oracle integration
+
+**AI Layer:**
+- Swarms - Multi-agent AI orchestration
+- SentimentAgent - Social media analysis
+- DataAgent - Historical pattern recognition
+- StrategyAgent - Trade recommendations
+
+**Oracle Layer:**
+- Pyth Network - Real-time price feeds
+- Automatic resolution - Trustless market settlement
+- Multiple price feeds - BTC, ETH, SOL, USDC, and more
 
 **Deployment:**
 - Vercel - Frontend hosting
 - Solana Devnet - Smart contract deployment
+- Swarms API - AI insights engine
+- Pyth Hermes - Price oracle endpoint
 
 ### Smart Contract Architecture
 
@@ -135,7 +163,26 @@ Traditional prediction markets suffer from opacity and trust issues. You never k
 │  ├─ BinaryTradingInterface (betting)    │
 │  ├─ ResolveMarketInterface (creator)    │
 │  ├─ ClaimWinnings (winners)             │
+│  ├─ MarketAnalyzer (AI insights)        │
 │  └─ ShareProfile/Market/Bet (social)    │
+│                                          │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│         Swarms AI Layer                  │
+├─────────────────────────────────────────┤
+│                                          │
+│  Multi-Agent Orchestration:              │
+│  ├─ SentimentAgent (social analysis)    │
+│  ├─ DataAgent (historical patterns)     │
+│  └─ StrategyAgent (recommendations)     │
+│                                          │
+│  Output:                                 │
+│  ├─ Market sentiment score              │
+│  ├─ Historical win rate analysis        │
+│  ├─ Optimal bet size suggestion         │
+│  └─ Confidence level + reasoning        │
 │                                          │
 └─────────────────────────────────────────┘
 ```

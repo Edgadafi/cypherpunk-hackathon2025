@@ -210,3 +210,7 @@ const ProfileStats = ({ stats, isOwnProfile }: ProfileStatsProps) => {
 
 export default ProfileStats;
 
+
+
+
+

@@ -375,3 +375,7 @@ Con 3-4 horas enfocado, tendrás el oracle completo y funcional.
 
 **¡Buen trabajo hoy!** 🎉
 
+
+
+
+

@@ -214,3 +214,7 @@ const ProfileActivity = ({ bets, walletAddress }: ProfileActivityProps) => {
 
 export default ProfileActivity;
 
+
+
+
+

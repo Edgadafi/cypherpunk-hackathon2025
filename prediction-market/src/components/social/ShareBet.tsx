@@ -36,3 +36,7 @@ const ShareBet = ({ bet, marketData }: ShareBetProps) => {
 
 export default ShareBet;
 
+
+
+
+
