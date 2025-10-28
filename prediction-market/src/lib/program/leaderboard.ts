@@ -121,7 +121,7 @@ async function calculateTraderStats(walletAddress: string): Promise<LeaderboardE
  */
 export async function fetchLeaderboard(
   sortBy: LeaderboardSortBy = 'roi',
-  limit: number = 100
+  limit: number = 50 // Reduced from 100 for faster load
 ): Promise<LeaderboardEntry[]> {
   console.log(`🏆 Fetching leaderboard sorted by ${sortBy}...`);
 
@@ -135,19 +135,22 @@ export async function fetchLeaderboard(
 
     console.log(`📊 Calculating stats for ${traders.length} traders...`);
 
-    // Calculate stats for each trader (batch with some parallelization)
-    const entries: LeaderboardEntry[] = [];
-    const batchSize = 5; // Process 5 traders at a time
+    // Limit traders to process for faster initial load
+    const tradersToProcess = traders.slice(0, Math.min(traders.length, limit * 2)); // Process 2x limit for better ranking
     
-    for (let i = 0; i < traders.length; i += batchSize) {
-      const batch = traders.slice(i, i + batchSize);
+    // Calculate stats for each trader (batch with more parallelization)
+    const entries: LeaderboardEntry[] = [];
+    const batchSize = 10; // Increased from 5 to 10 for faster processing
+    
+    for (let i = 0; i < tradersToProcess.length; i += batchSize) {
+      const batch = tradersToProcess.slice(i, i + batchSize);
       const batchResults = await Promise.all(
         batch.map(trader => calculateTraderStats(trader))
       );
       
       entries.push(...batchResults.filter((entry): entry is LeaderboardEntry => entry !== null));
       
-      console.log(`Progress: ${Math.min(i + batchSize, traders.length)}/${traders.length}`);
+      console.log(`Progress: ${Math.min(i + batchSize, tradersToProcess.length)}/${tradersToProcess.length}`);
     }
 
     // Filter out traders with no resolved bets

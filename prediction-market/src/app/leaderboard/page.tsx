@@ -23,7 +23,7 @@ export default function LeaderboardPage() {
   const wallet = useAnchorWallet();
   
   const [sortBy, setSortBy] = useState<LeaderboardSortBy>('roi');
-  const [limit, setLimit] = useState(50);
+  const [limit, setLimit] = useState(25); // Reduced from 50 for faster initial load
 
   // Load leaderboard with real-time updates
   const fetchLeaderboardData = useCallback(async (): Promise<LeaderboardData> => {
@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
     isAutoRefreshEnabled,
   } = useRealTimeData({
     fetchData: fetchLeaderboardData,
-    interval: 15000, // Refresh every 15 seconds
+    interval: 30000, // Refresh every 30 seconds (increased from 15 for performance)
     fetchOnMount: true,
     enabled: true,
   });
@@ -171,7 +171,7 @@ export default function LeaderboardPage() {
             {(leaderboardData?.entries.length || 0) >= limit && (
               <div className="text-center">
                 <button
-                  onClick={() => setLimit((prev) => prev + 50)}
+                  onClick={() => setLimit((prev) => prev + 25)} // Reduced from 50 to 25
                   className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
                 >
                   Load More Traders

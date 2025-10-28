@@ -6,6 +6,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey, AccountInfo } from "@solana/web3.js";
 import { PROGRAM_ID, RPC_ENDPOINT, CONNECTION_CONFIG } from "./constants";
+import { marketCache, CacheKeys, withCache } from "../cache/marketCache";
 import { deriveBetPDA } from "./direct";
 
 // Discriminators from IDL
@@ -159,71 +160,83 @@ function decodeMarketAccount(data: Buffer, address: PublicKey): MarketAccount | 
  * Fetch all market accounts owned by the program
  */
 export async function fetchAllMarketsDirect(): Promise<MarketAccount[]> {
-  console.log("🔍 Fetching markets directly from blockchain...");
-  
-  const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
+  return withCache(
+    CacheKeys.allMarkets(),
+    async () => {
+      console.log("🔍 Fetching markets directly from blockchain...");
+      
+      const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
 
-  try {
-    // Get all accounts owned by the program
-    const accounts = await connection.getProgramAccounts(PROGRAM_ID, {
-      filters: [
-        {
-          memcmp: {
-            offset: 0,
-            bytes: anchor.utils.bytes.bs58.encode(MARKET_DISCRIMINATOR),
-          },
-        },
-      ],
-    });
+      try {
+        // Get all accounts owned by the program
+        const accounts = await connection.getProgramAccounts(PROGRAM_ID, {
+          filters: [
+            {
+              memcmp: {
+                offset: 0,
+                bytes: anchor.utils.bytes.bs58.encode(MARKET_DISCRIMINATOR),
+              },
+            },
+          ],
+        });
 
-    console.log(`📦 Found ${accounts.length} market accounts`);
+        console.log(`📦 Found ${accounts.length} market accounts`);
 
-    // Decode each account
-    const markets: MarketAccount[] = [];
-    for (const { pubkey, account } of accounts) {
-      const decoded = decodeMarketAccount(account.data, pubkey);
-      if (decoded) {
-        markets.push(decoded);
-        console.log(`✅ Decoded market: ${decoded.question.substring(0, 50)}...`);
+        // Decode each account
+        const markets: MarketAccount[] = [];
+        for (const { pubkey, account } of accounts) {
+          const decoded = decodeMarketAccount(account.data, pubkey);
+          if (decoded) {
+            markets.push(decoded);
+            console.log(`✅ Decoded market: ${decoded.question.substring(0, 50)}...`);
+          }
+        }
+
+        console.log(`✅ Successfully decoded ${markets.length} markets`);
+        return markets;
+      } catch (error) {
+        console.error("❌ Error fetching markets:", error);
+        return [];
       }
-    }
-
-    console.log(`✅ Successfully decoded ${markets.length} markets`);
-    return markets;
-  } catch (error) {
-    console.error("❌ Error fetching markets:", error);
-    return [];
-  }
+    },
+    15000 // Cache for 15 seconds
+  );
 }
 
 /**
  * Fetch a single market account
  */
 export async function fetchMarketDirect(marketAddress: string): Promise<MarketAccount | null> {
-  console.log("🔍 Fetching market:", marketAddress);
-  
-  const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
+  return withCache(
+    CacheKeys.market(marketAddress),
+    async () => {
+      console.log("🔍 Fetching market:", marketAddress);
+      
+      const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
 
-  try {
-    const marketPubkey = new PublicKey(marketAddress);
-    const accountInfo = await connection.getAccountInfo(marketPubkey);
+      try {
+        const marketPubkey = new PublicKey(marketAddress);
+        const accountInfo = await connection.getAccountInfo(marketPubkey);
 
-    if (!accountInfo) {
-      console.log("❌ Market account not found");
-      return null;
-    }
+        if (!accountInfo) {
+          console.log("❌ Market account not found");
+          return null;
+        }
 
-    const decoded = decodeMarketAccount(accountInfo.data, marketPubkey);
+        const decoded = decodeMarketAccount(accountInfo.data, marketPubkey);
     
     if (decoded) {
       console.log(`✅ Decoded market: ${decoded.question}`);
     }
 
-    return decoded;
-  } catch (error) {
-    console.error("❌ Error fetching market:", error);
-    return null;
-  }
+        return decoded;
+      } catch (error) {
+        console.error("❌ Error fetching market:", error);
+        return null;
+      }
+    },
+    10000 // Cache for 10 seconds
+  );
 }
 
 /**
