@@ -5,14 +5,22 @@ import { useTheme } from '@/contexts/ThemeContext';
 import dynamic from 'next/dynamic';
 
 // Lazy load Recharts (reduces initial bundle by ~50KB)
-const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false }) as any;
-const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false }) as any;
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false }) as any;
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false }) as any;
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false }) as any;
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false }) as any;
-const Legend = dynamic(() => import('recharts').then(mod => mod.Legend), { ssr: false }) as any;
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false }) as any;
+// @ts-ignore - Recharts types don't align perfectly with next/dynamic
+const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false });
+// @ts-ignore
+const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false });
+// @ts-ignore
+const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
+// @ts-ignore
+const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
+// @ts-ignore
+const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
+// @ts-ignore
+const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
+// @ts-ignore
+const Legend = dynamic(() => import('recharts').then(mod => mod.Legend), { ssr: false });
+// @ts-ignore
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
 
 interface PricePoint {
   timestamp: number;

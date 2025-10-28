@@ -5,13 +5,20 @@ import { useTheme } from '@/contexts/ThemeContext';
 import dynamic from 'next/dynamic';
 
 // Lazy load Recharts components
-const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false }) as any;
-const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false }) as any;
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false }) as any;
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false }) as any;
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false }) as any;
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false }) as any;
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false }) as any;
+// @ts-ignore - Recharts types don't align perfectly with next/dynamic
+const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false });
+// @ts-ignore
+const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false });
+// @ts-ignore
+const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
+// @ts-ignore
+const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
+// @ts-ignore
+const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
+// @ts-ignore
+const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
+// @ts-ignore
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
 
 interface VolumePoint {
   timestamp: number;
