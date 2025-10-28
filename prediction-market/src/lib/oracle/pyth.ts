@@ -47,8 +47,11 @@ export async function fetchPythPrice(feedIdHex: string): Promise<PriceData | nul
     // Ensure feed ID has 0x prefix
     const formattedFeedId = feedIdHex.startsWith('0x') ? feedIdHex : `0x${feedIdHex}`;
     
-    // Get latest price data (HermesClient API)
-    const priceFeeds = await connection.getPriceFeeds([formattedFeedId]);
+    // Get latest price data (HermesClient uses query parameter)
+    const priceFeeds = await connection.getPriceFeeds({ 
+      query: formattedFeedId,
+      assetType: 'crypto'
+    });
     
     if (!priceFeeds || priceFeeds.length === 0) {
       console.error('No price feeds returned');
@@ -77,26 +80,19 @@ export async function fetchMultiplePrices(feedIdHexArray: string[]): Promise<Map
   try {
     const connection = new HermesClient(PYTH_ENDPOINT);
     
-    // Format all feed IDs
-    const formattedFeedIds = feedIdHexArray.map(id =>
-      id.startsWith('0x') ? id : `0x${id}`
-    );
-    
-    const priceFeeds = await connection.getPriceFeeds(formattedFeedIds);
-    
     const priceMap = new Map<string, PriceData>();
     
-    priceFeeds.forEach((feed) => {
-      const price = feed.price;
-      const feedIdHex = feed.id.replace('0x', '');
-      
-      priceMap.set(feedIdHex, {
-        price: Number(price.price) * Math.pow(10, price.expo),
-        expo: price.expo,
-        conf: Number(price.conf) * Math.pow(10, price.expo),
-        timestamp: price.publish_time,
-      });
-    });
+    // HermesClient doesn't support bulk queries easily, so we fetch one by one
+    for (const feedIdHex of feedIdHexArray) {
+      try {
+        const priceData = await fetchPythPrice(feedIdHex);
+        if (priceData) {
+          priceMap.set(feedIdHex, priceData);
+        }
+      } catch (err) {
+        console.error(`Error fetching price for ${feedIdHex}:`, err);
+      }
+    }
     
     return priceMap;
   } catch (error) {
