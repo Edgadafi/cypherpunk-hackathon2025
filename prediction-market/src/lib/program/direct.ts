@@ -135,16 +135,22 @@ function encodeCreateMarketData(
 
 /**
  * Create a market directly
+ * Supports both standard and oracle-enabled markets
  */
 export async function createMarketDirect(
   wallet: AnchorWallet,
   question: string,
   description: string,
-  endTime: number
+  endTime: number,
+  oracleEnabled: boolean = false,
+  oracleFeedId?: string, // hex string
+  oracleThreshold?: number,
+  oracleComparison?: number
 ): Promise<{ signature: string; marketPubkey: PublicKey }> {
   console.log("📝 Creating market (direct)...");
   console.log("  Question:", question);
   console.log("  End time:", endTime);
+  console.log("  Oracle enabled:", oracleEnabled);
   
   const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
   const marketKeypair = anchor.web3.Keypair.generate();
@@ -154,15 +160,37 @@ export async function createMarketDirect(
   
   // Encode instruction data
   const endTimeBN = new anchor.BN(endTime);
-  // Create market without oracle (oracle_enabled = false, all oracle params = None)
+  
+  // Prepare oracle parameters
+  let oracleFeedIdBuffer: Buffer | undefined;
+  let oracleThresholdBN: anchor.BN | undefined;
+  
+  if (oracleEnabled && oracleFeedId) {
+    console.log("  Oracle feed ID:", oracleFeedId);
+    console.log("  Oracle threshold:", oracleThreshold);
+    console.log("  Oracle comparison:", oracleComparison);
+    
+    // Convert hex string to Buffer
+    oracleFeedIdBuffer = Buffer.from(oracleFeedId, 'hex');
+    if (oracleFeedIdBuffer.length !== 32) {
+      throw new Error(`Invalid feed ID length: ${oracleFeedIdBuffer.length}, expected 32`);
+    }
+    
+    if (oracleThreshold !== undefined) {
+      // Convert threshold to i64 (price with 8 decimals)
+      // Pyth uses 8 decimal places for most feeds
+      oracleThresholdBN = new anchor.BN(Math.floor(oracleThreshold * 1e8));
+    }
+  }
+  
   const instructionData = encodeCreateMarketData(
     question, 
     description, 
     endTimeBN,
-    false, // oracle_enabled
-    undefined, // oracle_feed_id
-    undefined, // oracle_threshold
-    undefined  // oracle_comparison
+    oracleEnabled,
+    oracleFeedIdBuffer,
+    oracleThresholdBN,
+    oracleComparison
   );
   
   console.log("  Instruction data length:", instructionData.length);

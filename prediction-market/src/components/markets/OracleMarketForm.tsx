@@ -5,7 +5,7 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { AlertCircle, TrendingUp, Clock, DollarSign } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { PRICE_FEEDS, OracleConfig, ComparisonType, getFeedName, validateOracleConfig, formatPrice } from '@/lib/oracle/pyth';
-import { createOracleMarket } from '@/lib/program/oracle';
+import { createMarketDirect } from '@/lib/program/direct';
 
 export default function OracleMarketForm() {
   const wallet = useAnchorWallet();
@@ -75,15 +75,18 @@ export default function OracleMarketForm() {
     try {
       setIsCreating(true);
       
-      const signature = await createOracleMarket(
+      const result = await createMarketDirect(
         wallet,
         question,
         description,
         Math.floor(endDateTime.getTime() / 1000),
-        oracleConfig
+        true, // oracleEnabled
+        oracleConfig.feedId,
+        oracleConfig.threshold,
+        oracleConfig.comparison
       );
 
-      toast.success('Oracle market created! 🔮');
+      toast.success(`Oracle market created! 🔮\nMarket: ${result.marketPubkey.toBase58().slice(0, 8)}...`);
       
       // Reset form
       setQuestion('');
@@ -139,7 +142,7 @@ export default function OracleMarketForm() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Will Bitcoin be above $100,000 on Dec 31, 2025?"
-            className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400"
             maxLength={200}
           />
           <p className="text-xs text-gray-600 mt-1">
@@ -156,7 +159,7 @@ export default function OracleMarketForm() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Market resolves YES if BTC/USD price from Pyth Network is above $100,000 at the specified end time. Uses official Pyth price feed."
-            className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+            className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none text-gray-900 placeholder-gray-400"
             maxLength={500}
           />
           <p className="text-xs text-gray-600 mt-1">
@@ -175,8 +178,7 @@ export default function OracleMarketForm() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
             />
           </div>
           <div>
@@ -187,7 +189,7 @@ export default function OracleMarketForm() {
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
             />
           </div>
         </div>
@@ -207,7 +209,7 @@ export default function OracleMarketForm() {
             <select
               value={feedId}
               onChange={(e) => setFeedId(e.target.value)}
-              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
             >
               <option value="">Select asset...</option>
               {Object.entries(PRICE_FEEDS).map(([name, id]) => (
@@ -231,7 +233,7 @@ export default function OracleMarketForm() {
               placeholder="100000"
               step="0.01"
               min="0"
-              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400"
             />
             <p className="text-xs text-gray-600 mt-1">
               Example: Enter 100000 for $100,000
@@ -246,7 +248,7 @@ export default function OracleMarketForm() {
             <select
               value={comparison}
               onChange={(e) => setComparison(Number(e.target.value) as ComparisonType)}
-              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
             >
               <option value={0}>Price is ABOVE threshold (greater than)</option>
               <option value={1}>Price is BELOW threshold (less than)</option>
