@@ -6,24 +6,25 @@ import Link from 'next/link';
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-purple-900">
+      {/* Gradient Background - Updated with Official Colors */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-[#8B5CF6]">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
       </div>
 
-      {/* Floating Elements */}
+      {/* Floating Elements - Updated with Official Colors */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#00F0FF]/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#FF0080]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-[#FF7A2F]/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full mb-8 backdrop-blur-sm">
-            <Zap className="w-4 h-4 text-purple-400" />
-            <span className="text-sm text-purple-300 font-medium">
-              Build on Solana • 0.5% Comissions
+          {/* Badge - Updated with Official Colors */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF7A2F]/10 border border-[#FF7A2F]/30 rounded-full mb-8 backdrop-blur-sm">
+            <Zap className="w-4 h-4 text-[#FF7A2F]" />
+            <span className="text-sm text-[#FF7A2F] font-semibold tracking-wide">
+              CYPHERPUNK HACKATHON • SOLANA
             </span>
           </div>
 
@@ -50,12 +51,12 @@ const HeroSection = () => {
           {/* Problem Statement */}
           <p className="text-xl sm:text-2xl text-gray-300 mb-4 max-w-4xl mx-auto leading-relaxed">
             Political promises, public projects, and institutional commitments{' '}
-            <span className="text-pink-400 font-bold">lack transparent tracking</span>.
+            <span className="text-[#FF0080] font-bold">lack transparent tracking</span>.
           </p>
 
           {/* Solution Statement */}
-          <p className="text-lg sm:text-xl text-purple-300 mb-12 max-w-3xl mx-auto">
-            Create <span className="font-bold text-white">YES/NO markets</span> on promises and outcomes.
+          <p className="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            Create <span className="font-bold text-[#00F0FF]">YES/NO markets</span> on promises and outcomes.
             {' '}Community bets → Evidence decides → Accountability enforced.
           </p>
 
@@ -75,11 +76,11 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* CTAs */}
+          {/* CTAs - Updated with Official Gradient */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/create-market"
-              className="group px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-purple-500/50 flex items-center gap-2"
+              className="group px-8 py-4 bg-gradient-to-r from-[#00F0FF] via-[#FF0080] to-[#FF7A2F] hover:opacity-90 text-white font-bold rounded-lg transition-all duration-200 shadow-lg hover:shadow-[#00F0FF]/50 flex items-center gap-2"
             >
               <span>Create Market</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -87,7 +88,7 @@ const HeroSection = () => {
             
             <Link
               href="/markets"
-              className="px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-white/20 text-white font-semibold rounded-lg transition-all duration-200 flex items-center gap-2"
+              className="px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-[#00F0FF]/30 hover:border-[#00F0FF]/50 text-white font-semibold rounded-lg transition-all duration-200 flex items-center gap-2"
             >
               <TrendingUp className="w-5 h-5" />
               <span>Browse Markets</span>
