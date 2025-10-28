@@ -1,24 +1,24 @@
 <svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Rainbow Gradient for Hexagon: Cyan → Purple → Magenta → Orange → Yellow -->
+    <!-- Rainbow Gradient for Hexagon -->
     <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00F0FF"/>
-      <stop offset="25%" stop-color="#8B5CF6"/>
-      <stop offset="50%" stop-color="#FF0080"/>
-      <stop offset="75%" stop-color="#FF7A2F"/>
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="33%" stop-color="#FF0080"/>
+      <stop offset="67%" stop-color="#FF7A2F"/>
       <stop offset="100%" stop-color="#FFD700"/>
     </linearGradient>
     
-    <!-- Gradient for inner symbol: Purple/Pink top → Magenta/Red bottom -->
-    <linearGradient id="symbolGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#C77DFF"/>
-      <stop offset="50%" stop-color="#E0AAFF"/>
-      <stop offset="100%" stop-color="#FF006E"/>
+    <!-- Gradient for inner S: Purple → Pink → Orange/Yellow -->
+    <linearGradient id="sGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="50%" stop-color="#FF0080"/>
+      <stop offset="100%" stop-color="#FF7A2F"/>
     </linearGradient>
     
-    <!-- Text Gradient: Cyan → Magenta -->
+    <!-- Text Gradient: Teal/Cyan → Pink/Purple -->
     <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="50%" stop-color="#7DD3FC"/>
       <stop offset="100%" stop-color="#FF0080"/>
     </linearGradient>
   </defs>
@@ -27,51 +27,37 @@
   <path 
     d="M 120 45 L 165 75 L 165 125 L 120 155 L 75 125 L 75 75 Z" 
     stroke="url(#hexGrad)" 
-    stroke-width="5" 
+    stroke-width="4.5" 
     fill="none"
     stroke-linecap="round"
     stroke-linejoin="miter"/>
   
-  <!-- Dashed lines from corners to center (prismatic effect) -->
-  <g opacity="0.5">
-    <!-- Top to center -->
-    <line x1="120" y1="45" x2="120" y2="100" stroke="#00F0FF" stroke-width="2" stroke-dasharray="4,6"/>
-    <!-- Top-right to center -->
-    <line x1="165" y1="75" x2="120" y2="100" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="4,6"/>
-    <!-- Bottom-right to center -->
-    <line x1="165" y1="125" x2="120" y2="100" stroke="#FF0080" stroke-width="2" stroke-dasharray="4,6"/>
-    <!-- Bottom to center -->
-    <line x1="120" y1="155" x2="120" y2="100" stroke="#FF7A2F" stroke-width="2" stroke-dasharray="4,6"/>
-    <!-- Bottom-left to center -->
-    <line x1="75" y1="125" x2="120" y2="100" stroke="#FFD700" stroke-width="2" stroke-dasharray="4,6"/>
-    <!-- Top-left to center -->
-    <line x1="75" y1="75" x2="120" y2="100" stroke="#00F0FF" stroke-width="2" stroke-dasharray="4,6"/>
+  <!-- Dashed angular lines (wireframe/3D effect) - Teal, Green, Yellow -->
+  <g opacity="0.4">
+    <!-- Triangle patterns with angular lines -->
+    <line x1="120" y1="45" x2="120" y2="100" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="3,5"/>
+    <line x1="165" y1="75" x2="120" y2="100" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="3,5"/>
+    <line x1="165" y1="125" x2="120" y2="100" stroke="#10B981" stroke-width="1.5" stroke-dasharray="3,5"/>
+    <line x1="120" y1="155" x2="120" y2="100" stroke="#FFD700" stroke-width="1.5" stroke-dasharray="3,5"/>
+    <line x1="75" y1="125" x2="120" y2="100" stroke="#10B981" stroke-width="1.5" stroke-dasharray="3,5"/>
+    <line x1="75" y1="75" x2="120" y2="100" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="3,5"/>
+    
+    <!-- Additional angular cross lines -->
+    <line x1="97.5" y1="60" x2="142.5" y2="140" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="3,5"/>
+    <line x1="142.5" y1="60" x2="97.5" y2="140" stroke="#10B981" stroke-width="1.5" stroke-dasharray="3,5"/>
   </g>
   
-  <!-- Inner Symbol: Stylized curved "S" or "2" shape -->
-  <path 
-    d="M 100 75 
-       C 95 75, 90 78, 90 85
-       C 90 92, 95 95, 105 98
-       L 115 102
-       C 125 106, 130 110, 130 118
-       C 130 125, 125 130, 115 130
-       L 108 130" 
-    stroke="url(#symbolGrad)" 
-    stroke-width="7" 
-    fill="none"
-    stroke-linecap="round"
-    stroke-linejoin="round"/>
-  
-  <!-- Top curve detail of the symbol -->
-  <path 
-    d="M 108 75 L 125 75 
-       C 135 75, 140 80, 138 88" 
-    stroke="url(#symbolGrad)" 
-    stroke-width="7" 
-    fill="none"
-    stroke-linecap="round"
-    stroke-linejoin="round"/>
+  <!-- Angular "S" with thick, consistent stroke and sharp corners -->
+  <g fill="url(#sGrad)">
+    <!-- Top part of S - angular block -->
+    <path d="M 100 70 L 135 70 L 140 75 L 140 88 L 135 93 L 110 93 L 105 88 L 105 75 Z"/>
+    
+    <!-- Middle transition - diagonal angular piece -->
+    <path d="M 135 93 L 140 98 L 115 108 L 110 103 L 135 93 Z"/>
+    
+    <!-- Bottom part of S - angular block (mirrored) -->
+    <path d="M 105 108 L 140 108 L 140 121 L 135 126 L 100 126 L 100 121 L 105 116 L 130 116 L 135 121 L 135 113 L 105 113 Z"/>
+  </g>
   
   <!-- PrismaFi Text -->
   <text 
