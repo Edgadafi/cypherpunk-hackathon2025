@@ -44,7 +44,7 @@ const HeroSection = () => {
             </span>
             <br />
             <span className="text-gray-400 text-2xl sm:text-3xl lg:text-4xl">
-              Did they keep their promise? Let the market decide.
+              Turn accountability into a public good. Let on-chain truth decide.
             </span>
           </h1>
 
