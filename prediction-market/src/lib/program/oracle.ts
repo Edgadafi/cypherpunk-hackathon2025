@@ -10,9 +10,10 @@ import {
   TransactionInstruction,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
+  Connection,
 } from '@solana/web3.js';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
-import { getConnection, PROGRAM_ID } from '../solana/connection';
+import { PROGRAM_ID, RPC_ENDPOINT, CONNECTION_CONFIG } from './constants';
 import { OracleConfig, getPriceUpdateVaa, feedIdToBytes } from '../oracle/pyth';
 
 // Pyth program ID (devnet)
@@ -28,7 +29,7 @@ export async function createOracleMarket(
   endTime: number,
   oracleConfig: OracleConfig,
 ): Promise<string> {
-  const connection = getConnection();
+  const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
   
   // Generate market PDA
   const [marketPda] = await PublicKey.findProgramAddress(
@@ -129,7 +130,7 @@ export async function resolveWithOracle(
   marketId: string,
   feedIdHex: string,
 ): Promise<string> {
-  const connection = getConnection();
+  const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
   const marketPubkey = new PublicKey(marketId);
   
   // Get VAA from Pyth for price proof
@@ -187,7 +188,7 @@ export async function canResolveWithOracle(
   currentTime: number = Date.now() / 1000,
 ): Promise<boolean> {
   try {
-    const connection = getConnection();
+    const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
     const marketPubkey = new PublicKey(marketId);
     
     const accountInfo = await connection.getAccountInfo(marketPubkey);
@@ -222,7 +223,7 @@ export async function getMarketOracleConfig(
   marketId: string,
 ): Promise<OracleConfig | null> {
   try {
-    const connection = getConnection();
+    const connection = new Connection(RPC_ENDPOINT, CONNECTION_CONFIG.commitment);
     const marketPubkey = new PublicKey(marketId);
     
     const accountInfo = await connection.getAccountInfo(marketPubkey);
