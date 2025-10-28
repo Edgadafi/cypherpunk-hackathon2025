@@ -1,12 +1,14 @@
 'use client'
 
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Layout from '@/components/layout/Layout'
 import WalletInfo from '@/components/wallet/WalletInfo'
 import BinaryTradingInterface from '@/components/markets/BinaryTradingInterface'
 import ResolveMarketInterface from '@/components/markets/ResolveMarketInterface'
 import ClaimWinnings from '@/components/markets/ClaimWinnings'
+import OracleStatus from '@/components/markets/OracleStatus'
+import AutoResolveButton from '@/components/markets/AutoResolveButton'
 import ShareMarket from '@/components/social/ShareMarket'
 import RealTimeStatus from '@/components/common/RealTimeStatus'
 import { useWallet, useAnchorWallet } from '@solana/wallet-adapter-react'
@@ -23,6 +25,9 @@ export default function MarketDetailPage() {
   const params = useParams()
   const marketId = params.id as string
 
+  // State for raw market data (includes oracle fields)
+  const [rawMarketData, setRawMarketData] = React.useState<Awaited<ReturnType<typeof fetchMarketDirect>> | null>(null)
+
   // Load market from blockchain with real-time updates
   const fetchMarket = useCallback(async (): Promise<MockMarket | null> => {
     try {
@@ -30,6 +35,9 @@ export default function MarketDetailPage() {
       const marketData = await fetchMarketDirect(marketId)
 
       if (marketData) {
+        // Save raw data for oracle components
+        setRawMarketData(marketData)
+        
         // Transform to UI format
         const transformed: MockMarket = {
           id: marketId,
@@ -263,6 +271,30 @@ export default function MarketDetailPage() {
                   </div>
                 )}
               </div>
+
+              {/* Oracle Status (if oracle-enabled) */}
+              {rawMarketData?.oracleEnabled && rawMarketData?.oraclePriceFeedId && (
+                <OracleStatus
+                  oracleEnabled={rawMarketData.oracleEnabled}
+                  oracleFeedId={rawMarketData.oraclePriceFeedId}
+                  oracleThreshold={rawMarketData.oracleThreshold || 0}
+                  oracleComparison={rawMarketData.oracleComparison || 0}
+                  endTime={rawMarketData.endTime}
+                  resolved={rawMarketData.resolved}
+                />
+              )}
+
+              {/* Auto-Resolve Button (for oracle markets) */}
+              {rawMarketData?.oracleEnabled && rawMarketData?.oraclePriceFeedId && !market.resolved && (
+                <AutoResolveButton
+                  marketId={market.id}
+                  oracleEnabled={rawMarketData.oracleEnabled}
+                  oracleFeedId={rawMarketData.oraclePriceFeedId}
+                  endTime={rawMarketData.endTime}
+                  resolved={rawMarketData.resolved}
+                  onResolved={refresh}
+                />
+              )}
 
               {/* Resolution Interface (for market creator) */}
               <ResolveMarketInterface 

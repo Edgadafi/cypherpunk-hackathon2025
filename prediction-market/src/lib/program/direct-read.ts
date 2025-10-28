@@ -23,6 +23,11 @@ export interface MarketAccount {
   noAmount: number;
   resolved: boolean;
   winningOutcome: boolean;
+  // Oracle fields
+  oracleEnabled?: boolean;
+  oraclePriceFeedId?: number[];
+  oracleThreshold?: number;
+  oracleComparison?: number;
 }
 
 export interface BetAccount {
@@ -91,6 +96,42 @@ function decodeMarketAccount(data: Buffer, address: PublicKey): MarketAccount | 
 
     // Read winning_outcome (1 byte, bool)
     const winningOutcome = data.readUInt8(offset) !== 0;
+    offset += 1;
+
+    // Try to read oracle fields (these may not exist in older markets)
+    let oracleEnabled: boolean | undefined;
+    let oraclePriceFeedId: number[] | undefined;
+    let oracleThreshold: number | undefined;
+    let oracleComparison: number | undefined;
+
+    try {
+      if (offset < data.length) {
+        // Read oracle_enabled (1 byte, bool)
+        oracleEnabled = data.readUInt8(offset) !== 0;
+        offset += 1;
+
+        if (oracleEnabled && offset + 32 <= data.length) {
+          // Read oracle_price_feed_id (32 bytes)
+          oraclePriceFeedId = Array.from(data.slice(offset, offset + 32));
+          offset += 32;
+
+          if (offset + 8 <= data.length) {
+            // Read oracle_threshold (8 bytes, i64)
+            const thresholdBuffer = data.slice(offset, offset + 8);
+            oracleThreshold = new anchor.BN(thresholdBuffer, 'le').toNumber();
+            offset += 8;
+
+            if (offset + 1 <= data.length) {
+              // Read oracle_comparison (1 byte, u8)
+              oracleComparison = data.readUInt8(offset);
+            }
+          }
+        }
+      }
+    } catch (oracleError) {
+      // Oracle fields don't exist, that's okay (old market format)
+      console.log('No oracle data in market (old format or not oracle-enabled)');
+    }
 
     return {
       address: address.toBase58(),
@@ -103,6 +144,10 @@ function decodeMarketAccount(data: Buffer, address: PublicKey): MarketAccount | 
       noAmount,
       resolved,
       winningOutcome,
+      oracleEnabled,
+      oraclePriceFeedId,
+      oracleThreshold,
+      oracleComparison,
     };
   } catch (error) {
     console.error("Error decoding market account:", error);
