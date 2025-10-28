@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Layout from '@/components/layout/Layout'
 import WalletInfo from '@/components/wallet/WalletInfo'
@@ -130,8 +130,8 @@ export default function MarketDetailPage() {
   const endDate = new Date(market.endTime)
   const isExpired = endDate < new Date() && !market.resolved
 
-  // Generate mock analytics data based on current market state
-  const generateMockPriceData = () => {
+  // Memoize mock analytics data generation (expensive operations)
+  const mockPriceData = useMemo(() => {
     const now = Date.now();
     const startTime = market.createdAt.getTime();
     const duration = now - startTime;
@@ -149,9 +149,9 @@ export default function MarketDetailPage() {
         volume: market.totalYesAmount + market.totalNoAmount,
       };
     });
-  };
+  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesOdds]);
 
-  const generateMockVolumeData = () => {
+  const mockVolumeData = useMemo(() => {
     const now = Date.now();
     const startTime = market.createdAt.getTime();
     const duration = now - startTime;
@@ -169,9 +169,9 @@ export default function MarketDetailPage() {
         noVolume: (dayVolume * odds.noOdds) * (0.8 + Math.random() * 0.4),
       };
     });
-  };
+  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesOdds, odds.noOdds]);
 
-  const generateMockTradeHistory = () => {
+  const mockTradeHistory = useMemo(() => {
     const trades = [];
     const tradeCount = Math.min(Math.floor((market.totalYesAmount + market.totalNoAmount) / 0.5), 20);
     
@@ -188,7 +188,7 @@ export default function MarketDetailPage() {
     }
     
     return trades.sort((a, b) => b.timestamp - a.timestamp);
-  };
+  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesOdds, odds.noOdds, marketId, rawMarketData?.authority]);
 
   return (
     <Layout>
@@ -397,20 +397,20 @@ export default function MarketDetailPage() {
                 onClaimed={refresh}
               />
 
-              {/* Market Analytics - Charts */}
+              {/* Market Analytics - Charts (memoized data) */}
               <div className="space-y-6">
                 <MarketChart 
-                  data={generateMockPriceData()} 
+                  data={mockPriceData} 
                   title="Probability Over Time"
                 />
                 
                 <VolumeChart 
-                  data={generateMockVolumeData()} 
+                  data={mockVolumeData} 
                   title="Trading Volume"
                 />
                 
                 <TradeHistory 
-                  trades={generateMockTradeHistory()} 
+                  trades={mockTradeHistory} 
                   title="Recent Trades"
                   maxItems={10}
                 />
