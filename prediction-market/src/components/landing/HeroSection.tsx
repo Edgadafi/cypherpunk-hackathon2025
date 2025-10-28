@@ -31,7 +31,7 @@ const HeroSection = () => {
           {/* Logo - Responsive sizing for mobile */}
           <div className="mb-6 sm:mb-8 flex justify-center">
             <img 
-              src="/images/prismafi-logo.png" 
+              src="/images/prismafi-logo.svg" 
               alt="PrismaFi" 
               className="h-48 sm:h-64 md:h-72 w-auto"
             />

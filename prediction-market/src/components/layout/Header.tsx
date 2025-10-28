@@ -51,7 +51,7 @@ const Header = () => {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <img
-                src="/images/prismafi-logo.png"
+                src="/images/prismafi-logo.svg"
                 alt="PrismaFi"
                 className="h-10 w-auto brightness-100 hover:brightness-110 transition-all"
               />
