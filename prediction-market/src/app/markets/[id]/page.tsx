@@ -14,6 +14,7 @@ import RealTimeStatus from '@/components/common/RealTimeStatus'
 import { MarketChart } from '@/components/analytics/MarketChart'
 import { VolumeChart } from '@/components/analytics/VolumeChart'
 import { TradeHistory } from '@/components/analytics/TradeHistory'
+import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { useWallet, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 import { fetchMarketDirect, lamportsToSOL } from '@/lib/program/direct-read'
@@ -28,7 +29,7 @@ export default function MarketDetailPage() {
   const params = useParams()
   const marketId = params.id as string
 
-  // State for raw market data (includes oracle fields)
+  // State for raw market data (includes oracle fields) - MUST be before any return
   const [rawMarketData, setRawMarketData] = React.useState<Awaited<ReturnType<typeof fetchMarketDirect>> | null>(null)
 
   // Load market from blockchain with real-time updates
@@ -41,21 +42,27 @@ export default function MarketDetailPage() {
         // Save raw data for oracle components
         setRawMarketData(marketData)
         
-        // Transform to UI format
+        // Validate required fields
+        if (!marketData.question || !marketData.description) {
+          console.error('⚠️ Market data is incomplete:', marketData)
+          throw new Error('Market data is incomplete')
+        }
+        
+        // Transform to UI format with safe defaults
         const transformed: MockMarket = {
           id: marketId,
-          question: marketData.question,
-          description: marketData.description,
+          question: marketData.question || 'Untitled Market',
+          description: marketData.description || 'No description available',
           category: 'Other', // Default category
           creator: marketData.authority.toString().slice(0, 4) + '...' + marketData.authority.toString().slice(-4),
           createdAt: new Date(marketData.createdAt * 1000),
           endTime: new Date(marketData.endTime * 1000),
-          totalYesAmount: lamportsToSOL(marketData.yesAmount),
-          totalNoAmount: lamportsToSOL(marketData.noAmount),
+          totalYesAmount: lamportsToSOL(marketData.yesAmount) || 0,
+          totalNoAmount: lamportsToSOL(marketData.noAmount) || 0,
           resolved: marketData.resolved,
           winningOutcome: marketData.resolved ? marketData.winningOutcome : null,
         }
-        console.log('✅ Market data loaded/refreshed')
+        console.log('✅ Market data loaded/refreshed:', transformed)
         return transformed
       } else {
         throw new Error('Market not found on-chain')
@@ -64,6 +71,9 @@ export default function MarketDetailPage() {
       console.error('Error loading market:', err)
       // Fallback to mock data
       const mockMarket = getMarketById(marketId)
+      if (mockMarket) {
+        console.log('📦 Using mock market data for ID:', marketId)
+      }
       return mockMarket || null
     }
   }, [marketId])
@@ -83,6 +93,112 @@ export default function MarketDetailPage() {
     fetchOnMount: true,
     enabled: true,
   })
+
+  // ALL HOOKS MUST BE BEFORE ANY CONDITIONAL RETURNS
+  // Calculate odds (safe even if market is null)
+  const odds = useMemo(() => {
+    if (!market) return { yesPercentage: 50, noPercentage: 50, totalPool: 0 }
+    try {
+      return getMarketOdds(market)
+    } catch (err) {
+      console.error('Error calculating odds:', err)
+      return { yesPercentage: 50, noPercentage: 50, totalPool: 0 }
+    }
+  }, [market])
+
+  // Memoize mock analytics data (safe even if market is null)
+  const mockPriceData = useMemo(() => {
+    if (!market) return []
+    const now = Date.now();
+    const startTime = market.createdAt.getTime();
+    const duration = now - startTime;
+    const points = 10;
+    
+    return Array.from({ length: points }, (_, i) => {
+      const timestamp = startTime + (duration / points) * i;
+      const progress = i / points;
+      const targetYesOdds = odds.yesPercentage / 100;
+      const yesPrice = 0.5 + (targetYesOdds - 0.5) * progress + (Math.random() - 0.5) * 0.1;
+      return {
+        timestamp,
+        yesPrice: Math.max(0.1, Math.min(0.9, yesPrice)),
+        noPrice: Math.max(0.1, Math.min(0.9, 1 - yesPrice)),
+        volume: market.totalYesAmount + market.totalNoAmount,
+      };
+    });
+  }, [market, odds.yesPercentage]);
+
+  const mockVolumeData = useMemo(() => {
+    if (!market) return []
+    const now = Date.now();
+    const startTime = market.createdAt.getTime();
+    const duration = now - startTime;
+    const days = Math.ceil(duration / (1000 * 60 * 60 * 24));
+    const points = Math.min(days, 7);
+    
+    return Array.from({ length: points }, (_, i) => {
+      const timestamp = startTime + (duration / points) * i;
+      const totalVol = market.totalYesAmount + market.totalNoAmount;
+      const dayVolume = totalVol / points;
+      const yesOdds = odds.yesPercentage / 100;
+      const noOdds = odds.noPercentage / 100;
+      return {
+        timestamp,
+        volume: dayVolume * (0.8 + Math.random() * 0.4),
+        yesVolume: (dayVolume * yesOdds) * (0.8 + Math.random() * 0.4),
+        noVolume: (dayVolume * noOdds) * (0.8 + Math.random() * 0.4),
+      };
+    });
+  }, [market, odds.yesPercentage, odds.noPercentage]);
+
+  const mockTradeHistory = useMemo(() => {
+    if (!market) return []
+    const trades = [];
+    const tradeCount = Math.min(Math.floor((market.totalYesAmount + market.totalNoAmount) / 0.5), 20);
+    const yesOdds = odds.yesPercentage / 100;
+    const noOdds = odds.noPercentage / 100;
+    
+    for (let i = 0; i < tradeCount; i++) {
+      const side = Math.random() > yesOdds ? 'no' : 'yes';
+      trades.push({
+        signature: `mock_${marketId}_${i}`,
+        trader: rawMarketData?.authority.toString() || `${Math.random().toString(36).substr(2, 40)}`,
+        side,
+        amount: 0.5 + Math.random() * 2,
+        timestamp: market.createdAt.getTime() + Math.random() * (Date.now() - market.createdAt.getTime()),
+        price: side === 'yes' ? yesOdds : noOdds,
+      });
+    }
+    
+    return trades.sort((a, b) => b.timestamp - a.timestamp);
+  }, [market, marketId, odds.yesPercentage, odds.noPercentage, rawMarketData?.authority]);
+
+  // NOW do conditional checks and returns
+  const hasInvalidMarketId = !marketId || typeof marketId !== 'string'
+
+  if (hasInvalidMarketId) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-black py-20 px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h1 className="text-2xl font-bold text-white mb-4">
+              ID de Mercado Inválido
+            </h1>
+            <p className="text-gray-400 mb-6">
+              No se pudo cargar el mercado. El ID proporcionado no es válido.
+            </p>
+            <Link
+              href="/markets"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
+            >
+              ← Volver a Mercados
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -126,78 +242,14 @@ export default function MarketDetailPage() {
     )
   }
 
-  const odds = getMarketOdds(market)
+  // Safe to use market properties now (after hooks, after null checks)
   const endDate = new Date(market.endTime)
   const isExpired = endDate < new Date() && !market.resolved
 
-  // Memoize mock analytics data generation (expensive operations)
-  const mockPriceData = useMemo(() => {
-    const now = Date.now();
-    const startTime = market.createdAt.getTime();
-    const duration = now - startTime;
-    const points = 10;
-    
-    return Array.from({ length: points }, (_, i) => {
-      const timestamp = startTime + (duration / points) * i;
-      const progress = i / points;
-      // Simulate price evolution towards current odds
-      const targetYesOdds = odds.yesPercentage / 100; // Convert percentage to decimal
-      const yesPrice = 0.5 + (targetYesOdds - 0.5) * progress + (Math.random() - 0.5) * 0.1;
-      return {
-        timestamp,
-        yesPrice: Math.max(0.1, Math.min(0.9, yesPrice)),
-        noPrice: Math.max(0.1, Math.min(0.9, 1 - yesPrice)),
-        volume: market.totalYesAmount + market.totalNoAmount,
-      };
-    });
-  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesPercentage]);
-
-  const mockVolumeData = useMemo(() => {
-    const now = Date.now();
-    const startTime = market.createdAt.getTime();
-    const duration = now - startTime;
-    const days = Math.ceil(duration / (1000 * 60 * 60 * 24));
-    const points = Math.min(days, 7); // Show last 7 days max
-    
-    return Array.from({ length: points }, (_, i) => {
-      const timestamp = startTime + (duration / points) * i;
-      const totalVol = market.totalYesAmount + market.totalNoAmount;
-      const dayVolume = totalVol / points;
-      const yesOdds = odds.yesPercentage / 100; // Convert percentage to decimal
-      const noOdds = odds.noPercentage / 100; // Convert percentage to decimal
-      return {
-        timestamp,
-        volume: dayVolume * (0.8 + Math.random() * 0.4),
-        yesVolume: (dayVolume * yesOdds) * (0.8 + Math.random() * 0.4),
-        noVolume: (dayVolume * noOdds) * (0.8 + Math.random() * 0.4),
-      };
-    });
-  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesPercentage, odds.noPercentage]);
-
-  const mockTradeHistory = useMemo(() => {
-    const trades = [];
-    const tradeCount = Math.min(Math.floor((market.totalYesAmount + market.totalNoAmount) / 0.5), 20);
-    const yesOdds = odds.yesPercentage / 100; // Convert percentage to decimal
-    const noOdds = odds.noPercentage / 100; // Convert percentage to decimal
-    
-    for (let i = 0; i < tradeCount; i++) {
-      const side = Math.random() > yesOdds ? 'no' : 'yes';
-      trades.push({
-        signature: `mock_${marketId}_${i}`,
-        trader: rawMarketData?.authority.toString() || `${Math.random().toString(36).substr(2, 40)}`,
-        side,
-        amount: 0.5 + Math.random() * 2,
-        timestamp: market.createdAt.getTime() + Math.random() * (Date.now() - market.createdAt.getTime()),
-        price: side === 'yes' ? yesOdds : noOdds,
-      });
-    }
-    
-    return trades.sort((a, b) => b.timestamp - a.timestamp);
-  }, [market.createdAt, market.totalYesAmount, market.totalNoAmount, odds.yesPercentage, odds.noPercentage, marketId, rawMarketData?.authority]);
-
   return (
-    <Layout>
-      <div className="min-h-screen bg-black py-20 px-4">
+    <ErrorBoundary>
+      <Layout>
+        <div className="min-h-screen bg-black py-20 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <Link
@@ -452,5 +504,6 @@ export default function MarketDetailPage() {
         </div>
       </div>
     </Layout>
+    </ErrorBoundary>
   )
 }

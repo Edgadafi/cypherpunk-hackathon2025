@@ -29,6 +29,16 @@ export default function BinaryTradingInterface({
   const [existingBet, setExistingBet] = useState<any>(null)
   const [isCheckingBet, setIsCheckingBet] = useState(false)
 
+  // Validate market data
+  if (!market || !market.id) {
+    return (
+      <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6 text-center">
+        <div className="text-4xl mb-3">⚠️</div>
+        <p className="text-red-300">Error: Datos de mercado no válidos</p>
+      </div>
+    )
+  }
+
   const odds = getMarketOdds(market)
 
   // Check if user already has a bet on this market
@@ -235,13 +245,21 @@ export default function BinaryTradingInterface({
   }
 
   const calculatePotentialWinnings = () => {
-    const amount = parseFloat(betAmount)
-    if (isNaN(amount) || amount <= 0 || selectedOutcome === null) return 0
+    try {
+      const amount = parseFloat(betAmount)
+      if (isNaN(amount) || amount <= 0 || selectedOutcome === null) return 0
 
-    const currentOdds =
-      selectedOutcome ? odds.yesPercentage : odds.noPercentage
-    const multiplier = 100 / currentOdds
-    return amount * multiplier
+      const currentOdds =
+        selectedOutcome ? odds.yesPercentage : odds.noPercentage
+      
+      if (currentOdds === 0) return 0
+      
+      const multiplier = 100 / currentOdds
+      return amount * multiplier
+    } catch (error) {
+      console.error('Error calculating potential winnings:', error)
+      return 0
+    }
   }
 
   return (

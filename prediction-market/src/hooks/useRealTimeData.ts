@@ -72,24 +72,32 @@ export function useRealTimeData<T>({
       
       setError(null);
       
+      console.log('🔄 Starting data fetch...');
       const result = await fetchData();
+      console.log('✅ Data fetch complete:', result);
+      console.log('📍 mountedRef.current:', mountedRef.current);
+      console.log('📍 About to update state...');
       
-      if (mountedRef.current) {
-        setData(result);
-        setLastUpdated(new Date());
-      }
+      // ALWAYS update state - React 18 handles cleanup automatically
+      // mountedRef check was causing issues with StrictMode double-mounting
+      console.log('📍 Calling setData (ignoring mountedRef)...');
+      setData(result);
+      setLastUpdated(new Date());
+      console.log('💾 State updated with new data');
+
     } catch (err) {
-      console.error('Error fetching real-time data:', err);
-      if (mountedRef.current) {
-        setError(err as Error);
-      }
+      console.error('❌ Error fetching real-time data:', err);
+      // Always set error - React handles cleanup
+      setError(err as Error);
     } finally {
-      if (mountedRef.current) {
-        setIsLoading(false);
-        setIsRefreshing(false);
-      }
+      console.log('📍 Finally block, mountedRef:', mountedRef.current);
+      // ALWAYS update loading state, even if unmounting
+      // This prevents stuck loading states
+      console.log('🏁 Loading complete, setting isLoading=false');
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
-  }, [fetchData, ...deps]);
+  }, [fetchData]);
 
   const refresh = useCallback(async () => {
     await loadData(false);
@@ -101,10 +109,27 @@ export function useRealTimeData<T>({
 
   // Initial load
   useEffect(() => {
+    let cancelled = false;
+    
     if (fetchOnMount) {
-      loadData(true);
+      console.log('🚀 Initial data load triggered');
+      
+      // Wrap loadData to check cancellation
+      const load = async () => {
+        if (!cancelled) {
+          await loadData(true);
+        }
+      };
+      
+      load();
     }
-  }, []);
+    
+    return () => {
+      cancelled = true;
+      console.log('🔴 Cleanup: cancelling initial load');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchOnMount]);
 
   // Auto-refresh polling
   useEffect(() => {
@@ -171,6 +196,7 @@ export function formatLastUpdated(date: Date | null): string {
   
   return date.toLocaleTimeString();
 }
+
 
 
 

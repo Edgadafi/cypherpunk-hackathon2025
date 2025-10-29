@@ -88,6 +88,16 @@ export default function MarketsPage() {
     enabled: true,
   })
 
+  // Debug logging
+  useEffect(() => {
+    console.log('📊 Markets page state:', {
+      isLoading,
+      marketsCount: markets?.length || 0,
+      error: error?.message,
+      lastUpdated: lastUpdated?.toISOString(),
+    })
+  }, [isLoading, markets, error, lastUpdated])
+
   // Apply filters
   useEffect(() => {
     if (!markets) {
@@ -129,7 +139,7 @@ export default function MarketsPage() {
           {connected ? (
             <div className="mb-6">
               <WalletInfo />
-              {isLoading && (
+              {isLoading && !markets && (
                 <div className="mt-4 bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
                   <div className="flex items-center justify-center gap-3">
                     <span className="text-2xl animate-spin">⏳</span>
