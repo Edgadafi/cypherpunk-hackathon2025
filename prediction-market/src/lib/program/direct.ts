@@ -319,16 +319,33 @@ export async function placeBetDirect(
   // Create and send transaction
   const transaction = new Transaction().add(instruction);
   transaction.feePayer = wallet.publicKey;
-  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+  
+  // Get latest blockhash ONCE and store it
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash(CONNECTION_CONFIG.commitment);
+  transaction.recentBlockhash = blockhash;
+  
+  console.log("  Blockhash:", blockhash.slice(0, 8) + "...");
+  console.log("  Last valid block height:", lastValidBlockHeight);
   
   // Sign transaction
   const signedTx = await wallet.signTransaction(transaction);
   
-  // Send transaction
-  const signature = await connection.sendRawTransaction(signedTx.serialize());
+  // Send transaction with proper options
+  const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: CONNECTION_CONFIG.commitment,
+    maxRetries: 2
+  });
   
-  // Confirm transaction
-  await connection.confirmTransaction(signature, CONNECTION_CONFIG.commitment);
+  console.log("  Transaction sent:", signature);
+  console.log("  Confirming...");
+  
+  // Confirm transaction with the same blockhash we used
+  await connection.confirmTransaction({
+    signature,
+    blockhash,
+    lastValidBlockHeight
+  }, CONNECTION_CONFIG.commitment);
   
   console.log("✅ Bet placed! Tx:", signature);
   
@@ -387,16 +404,32 @@ export async function resolveMarketDirect(
   // Create and send transaction
   const transaction = new Transaction().add(instruction);
   transaction.feePayer = wallet.publicKey;
-  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+  
+  // Get latest blockhash ONCE and store it
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash(CONNECTION_CONFIG.commitment);
+  transaction.recentBlockhash = blockhash;
+  
+  console.log("  Blockhash:", blockhash.slice(0, 8) + "...");
   
   // Sign transaction
   const signedTx = await wallet.signTransaction(transaction);
   
-  // Send transaction
-  const signature = await connection.sendRawTransaction(signedTx.serialize());
+  // Send transaction with proper options
+  const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: CONNECTION_CONFIG.commitment,
+    maxRetries: 2
+  });
   
-  // Confirm transaction
-  await connection.confirmTransaction(signature, CONNECTION_CONFIG.commitment);
+  console.log("  Transaction sent:", signature);
+  console.log("  Confirming...");
+  
+  // Confirm transaction with the same blockhash we used
+  await connection.confirmTransaction({
+    signature,
+    blockhash,
+    lastValidBlockHeight
+  }, CONNECTION_CONFIG.commitment);
   
   console.log("✅ Market resolved! Tx:", signature);
   
@@ -449,16 +482,32 @@ export async function claimWinningsDirect(
   // Create and send transaction
   const transaction = new Transaction().add(instruction);
   transaction.feePayer = wallet.publicKey;
-  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+  
+  // Get latest blockhash ONCE and store it
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash(CONNECTION_CONFIG.commitment);
+  transaction.recentBlockhash = blockhash;
+  
+  console.log("  Blockhash:", blockhash.slice(0, 8) + "...");
   
   // Sign transaction
   const signedTx = await wallet.signTransaction(transaction);
   
-  // Send transaction
-  const signature = await connection.sendRawTransaction(signedTx.serialize());
+  // Send transaction with proper options
+  const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: CONNECTION_CONFIG.commitment,
+    maxRetries: 2
+  });
   
-  // Confirm transaction
-  await connection.confirmTransaction(signature, CONNECTION_CONFIG.commitment);
+  console.log("  Transaction sent:", signature);
+  console.log("  Confirming...");
+  
+  // Confirm transaction with the same blockhash we used
+  await connection.confirmTransaction({
+    signature,
+    blockhash,
+    lastValidBlockHeight
+  }, CONNECTION_CONFIG.commitment);
   
   console.log("✅ Winnings claimed! Tx:", signature);
   
