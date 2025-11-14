@@ -188,7 +188,11 @@ pub mod prediction_market {
             market.no_amount
         };
         
+        // Edge case: Market resolved but no one bet on winning outcome
         require!(winning_pool > 0, ErrorCode::NoWinnings);
+        
+        // Edge case: Total pool is zero (shouldn't happen but safety check)
+        require!(total_pool > 0, ErrorCode::NoWinnings);
         
         // Calculate user's share: (user_bet / winning_pool) * total_pool
         let winnings = (bet.amount as u128)
@@ -196,12 +200,15 @@ pub mod prediction_market {
             .checked_div(winning_pool as u128).ok_or(ErrorCode::MathOverflow)?
             as u64;
         
+        // Edge case: Calculated winnings is zero (rounding down)
         require!(winnings > 0, ErrorCode::NoWinnings);
         
+        // Validate market account has sufficient balance
+        let market_balance = market.to_account_info().lamports();
+        require!(market_balance >= winnings, ErrorCode::NoWinnings);
+        
         // Transfer winnings from market to user
-        **market.to_account_info().try_borrow_mut_lamports()? = market
-            .to_account_info()
-            .lamports()
+        **market.to_account_info().try_borrow_mut_lamports()? = market_balance
             .checked_sub(winnings)
             .ok_or(ErrorCode::MathOverflow)?;
         

@@ -726,6 +726,71 @@ const debouncedSearch = useMemo(
 
 ---
 
+## Extensibility: SPL Token Support (v2)
+
+The current architecture uses SOL (native token) for all betting operations. However, the design is **extensible** to support SPL tokens (USDC, USDT, etc.) in future versions.
+
+### Current Architecture (SOL-Only)
+
+**Market Account Structure:**
+```rust
+pub struct Market {
+    // ... existing fields ...
+    pub yes_amount: u64,  // SOL lamports
+    pub no_amount: u64,   // SOL lamports
+}
+```
+
+**Betting Flow:**
+- Uses `system_instruction::transfer` for SOL transfers
+- Market account holds SOL directly
+- Payouts use direct lamport transfers
+
+### Future Architecture (Multi-Token)
+
+**Proposed Market Structure:**
+```rust
+use anchor_spl::token::{TokenAccount, Mint};
+
+pub struct Market {
+    // ... existing fields ...
+    pub accepted_tokens: Vec<Pubkey>,  // List of token mints
+    pub token_pools: Vec<TokenPool>,   // Per-token pools
+}
+
+pub struct TokenPool {
+    pub mint: Pubkey,
+    pub yes_token_account: Pubkey,  // ATA for YES pool
+    pub no_token_account: Pubkey,    // ATA for NO pool
+    pub yes_amount: u64,
+    pub no_amount: u64,
+}
+```
+
+**Proposed Betting Flow:**
+1. User selects token type (SOL, USDC, USDT)
+2. If SPL token: Transfer to market's token account
+3. If SOL: Use existing flow
+4. Market tracks pools separately per token
+5. Payouts use appropriate token account
+
+### Migration Path
+
+**Backward Compatibility:**
+- Existing markets continue using SOL
+- New markets can opt-in to multi-token
+- Gradual migration with user education
+
+**Technical Requirements:**
+- Anchor SPL token program integration
+- Token account management (ATAs)
+- Multi-token balance tracking
+- UI updates for token selection
+
+**See [ROADMAP.md](./ROADMAP.md) for detailed v2 plans.**
+
+---
+
 ## Future Improvements
 
 ### Performance

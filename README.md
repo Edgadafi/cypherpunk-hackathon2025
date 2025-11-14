@@ -385,7 +385,15 @@ Visit `http://localhost:3000`
 - [ ] Market maker interface
 - [ ] API for trading bots
 
-### 🌍 Phase 4: Mainnet & Growth
+### 💰 Phase 4: Stablecoins & Multi-Token Support (v2)
+- [ ] **USDC/USDT Support** - Bet using stablecoins for price stability
+- [ ] **On-Ramp Integration** - Direct fiat-to-crypto (Ramp, Moonpay, Transak)
+- [ ] **Off-Ramp Integration** - Convert winnings to fiat
+- [ ] **SPL Token Program** - Support for multiple token types
+- [ ] **Migration Path** - Seamless transition from SOL-only to multi-token
+- [ ] **Token Selection UI** - Choose between SOL, USDC, USDT when betting
+
+### 🌍 Phase 5: Mainnet & Growth
 - [ ] Solana mainnet deployment
 - [ ] Partnerships with data providers
 - [ ] Integration with Pyth/Chainlink oracles
@@ -420,8 +428,9 @@ anchor test
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how:
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
 
+**Quick Start:**
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
@@ -435,18 +444,29 @@ We welcome contributions! Here's how:
 - Test on Solana Devnet before PR
 - Update documentation for new features
 
+**See also:**
+- [ROADMAP.md](./ROADMAP.md) - Future features and plans
+- [CHANGELOG.md](./CHANGELOG.md) - Version history
+- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Common issues and solutions
+
 ---
 
 ## 🐛 Known Issues & Limitations
 
 ### Current Limitations
 - **Devnet Only** - Not on mainnet yet (use test SOL)
+- **SOL-Only Betting** - Currently supports only SOL for betting. Stablecoin support (USDC/USDT) planned for v2
 - **Binary Markets** - Scalar markets coming in Phase 3
-- **Manual Resolution** - Creator must manually resolve (automation planned)
+- **Manual Resolution** - Creator must manually resolve (automation planned via oracles)
 - **No Dispute Mechanism** - Trust-based resolution (UMA integration planned)
+- **No On-Ramp/Off-Ramp** - Direct fiat-to-crypto conversion not yet integrated
 
-### Planned Fixes
-- [ ] Automated resolution via Chainlink/Pyth oracles
+### Planned Fixes (v2)
+- [x] Automated resolution via Pyth Network oracles ✅ (Completed)
+- [ ] **Stablecoin Support (USDC/USDT)** - Bet using stablecoins instead of SOL
+- [ ] **On-Ramp Integration** - Direct fiat-to-crypto via Ramp, Moonpay, etc.
+- [ ] **Off-Ramp Integration** - Convert winnings back to fiat
+- [ ] **SPL Token Program Integration** - Support for multiple token types
 - [ ] Dispute mechanism for incorrect resolutions
 - [ ] Gas optimization for claim transactions
 - [ ] Improved error messages

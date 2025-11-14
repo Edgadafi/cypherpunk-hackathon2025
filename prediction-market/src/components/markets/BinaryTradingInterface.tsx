@@ -239,34 +239,51 @@ export default function BinaryTradingInterface({
       console.error('Error placing bet:', error)
 
       let errorMessage = 'Failed to place bet. Please try again.'
+      let shouldRefreshBet = false
 
-      if (error.message?.includes('User rejected')) {
+      // Parse error message for better user feedback
+      const errorMsg = error.message || error.toString() || ''
+
+      if (errorMsg.includes('User rejected') || errorMsg.includes('User cancelled')) {
         errorMessage = 'Transaction cancelled by user.'
-      } else if (error.message?.includes('Insufficient funds')) {
+      } else if (errorMsg.includes('Insufficient funds') || errorMsg.includes('insufficient funds')) {
         errorMessage = 'Insufficient SOL balance. Please fund your wallet.'
-      } else if (error.message?.includes('already been processed')) {
-        errorMessage = 'You already have a bet on this market. The bet account (PDA) already exists on-chain. Reload the page to see your existing bet.'
-      } else if (error.message?.includes('PDA already exists')) {
-        errorMessage = error.message // Use our custom message from the double-check
-      } else if (error.message?.includes('already have a')) {
-        errorMessage = error.message // Use our custom message from the double-check
-      } else if (error.message?.includes('MarketExpired')) {
-        errorMessage = 'This market has expired.'
-      } else if (error.message?.includes('MarketResolved')) {
-        errorMessage = 'This market has already been resolved.'
-      } else if (error.message?.includes('BetTooSmall')) {
+      } else if (errorMsg.includes('already been processed') || 
+                 errorMsg.includes('PDA already exists') || 
+                 errorMsg.includes('already have a')) {
+        errorMessage = 'You already have a bet on this market. The bet account (PDA) already exists on-chain. Please reload the page to see your existing bet.'
+        shouldRefreshBet = true
+      } else if (errorMsg.includes('MarketExpired') || errorMsg.includes('market expired')) {
+        errorMessage = 'This market has expired. Trading is no longer available.'
+      } else if (errorMsg.includes('MarketResolved') || errorMsg.includes('market resolved')) {
+        errorMessage = 'This market has already been resolved. You cannot place new bets.'
+      } else if (errorMsg.includes('BetTooSmall') || errorMsg.includes('bet too small')) {
         errorMessage = 'Bet amount too small. Minimum is 0.01 SOL.'
-      } else if (error.message) {
-        errorMessage = error.message
+      } else if (errorMsg.includes('Network') || errorMsg.includes('connection')) {
+        errorMessage = 'Network error. Please check your connection and try again.'
+      } else if (errorMsg.includes('timeout') || errorMsg.includes('Timeout')) {
+        errorMessage = 'Transaction timeout. Please try again.'
+      } else if (errorMsg) {
+        // Use the error message if it's user-friendly, otherwise use generic
+        errorMessage = errorMsg.length > 100 
+          ? 'Transaction failed. Please check your wallet and try again.' 
+          : errorMsg
       }
 
-      toast.error(errorMessage, { duration: 6000 })
+      toast.error(errorMessage, { 
+        duration: 6000,
+        icon: '⚠️'
+      })
       
-      // Force refresh existing bet state
-      if (error.message?.includes('already')) {
-        const marketPubkey = new PublicKey(market.id)
-        const bet = await fetchUserBet(wallet.publicKey, marketPubkey)
-        setExistingBet(bet)
+      // Force refresh existing bet state if needed
+      if (shouldRefreshBet && wallet?.publicKey) {
+        try {
+          const marketPubkey = new PublicKey(market.id)
+          const bet = await fetchUserBet(wallet.publicKey, marketPubkey)
+          setExistingBet(bet)
+        } catch (refreshError) {
+          console.error('Error refreshing bet state:', refreshError)
+        }
       }
     } finally {
       setIsSubmitting(false)
